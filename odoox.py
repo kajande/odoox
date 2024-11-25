@@ -1,53 +1,40 @@
 import docker
 import subprocess
+from pathlib import Path
 
-from db import DB
+from config import Config
 
 class Odoox:
     
     client = docker.from_env()
-    db = DB()
+    config = Config()
 
-    def __init__(self, odoo_id=None, pg_id=None):
-        ids = self.db.get()
-        if ids:
-            pg_id, odoo_id = ids
-        self.pg_id = pg_id
-        self.odoo_id = odoo_id
+    @property
+    def project_name(self):   
+        return Path(self.config['project']['path']).resolve().stem
+    
+    @property
+    def pg_name(self):
+        return self.project_name + '_pg'
+    
+    @property
+    def odoo_name(self):
+        return self.project_name + '_odoo'
 
     def run(self, options):
-        pg_options = {
-            'image': 'postgres:15',
-            'detach': True,
-            'environment':{
-                'POSTGRES_USER': 'odoo',
-                'POSTGRES_PASSWORD': 'odoo',
-                'POSTGRES_DB': 'postgres',
-            },
-            'name': 'pg',
-        }
+        pg_options = self.config['postgres']
+        odoo_options = self.config['odoo']
 
-        odoo_options = {
-            'image': 'odoo',
-            'detach': True,
-            'stdout': True,
-            'stream': True,
-            'ports': {
-                '8069/tcp': 8069
-            },
-            'links': {
-                'pg': 'db',
-            },
-            'tty': True,
-            'name': 'odoo',
+        pg_options['name'] = self.pg_name
+        odoo_options['name'] = self.odoo_name
+        odoo_options['links'] = {
+            self.pg_name: 'db'
         }
 
         pg = self.client.containers.run(**pg_options)
         print(pg.id)
         odoo = self.client.containers.run(**odoo_options)
         print(odoo.id)
-        
-        self.db.save(pg.id, odoo.id)
 
         return odoo.logs(stream=True)
 
@@ -58,9 +45,9 @@ class Odoox:
         if '--odoo' in options: options.remove('--odoo')
         if '-o' in options: options.remove('-o')
         if pg:
-            subprocess.run(['docker', command] + options + [self.pg_id])
+            subprocess.run(['docker', command] + options + [self.pg_name])
         if odoo:
-            subprocess.run(['docker', command] + options + [self.odoo_id])
+            subprocess.run(['docker', command] + options + [self.odoo_name])
 
 
 if __name__ == '__main__':

@@ -14,6 +14,8 @@ odoox = Odoox()
 
 if args.command[0] == 'docker':
     subprocess.run(args.command + args.options)
+elif args.command[0] == 'build':
+    odoox.build(args.options)
 elif args.command[0] == 'run':
     odoox.run(args.options)
 else:

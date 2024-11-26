@@ -24,4 +24,6 @@ else:
         pg = True
     if '--odoo' in args.options or '-o' in args.options:
         odoo = True
+    if '-og' in args.options or '-go' in args.options:
+        pg, odoo = True, True
     odoox.execute(args.command[0], args.options, pg=pg, odoo=odoo)

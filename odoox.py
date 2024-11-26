@@ -74,6 +74,8 @@ class Odoox:
         if '-g' in options: options.remove('-g')
         if '--odoo' in options: options.remove('--odoo')
         if '-o' in options: options.remove('-o')
+        if '-og' in options: options.remove('-og')
+        if '-go' in options: options.remove('-go')
         if command == 'rm':
             options = ['-vf'] + options
         if pg:

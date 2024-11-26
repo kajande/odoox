@@ -80,6 +80,9 @@ class Odoox:
             subprocess.run(['docker', command] + options + [self.odoo_name])
         if command == 'ps':
             self.list_containers(options)
+        if command == 'image':
+            if '--rm' in options:
+                self.remove_image(options)
         if command == 'images':
             self.list_images(options)
 
@@ -88,6 +91,13 @@ class Odoox:
 
     def list_images(self, options):
         subprocess.run(['docker', 'images'] + [f"{self.user}/{self.project_name}"] + options)
+
+    def remove_image(self, options):
+        tag = options[options.index('--rm')+1]
+        options.remove('--rm')
+        options.remove(tag)
+        command = ['docker', 'image', 'rm', '-f'] + [f"{self.user}/{self.project_name}:{tag}"] + options
+        subprocess.run(command)
 
 if __name__ == '__main__':
     o = Odoox()

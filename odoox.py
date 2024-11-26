@@ -14,6 +14,10 @@ class Odoox:
         return self.config['project']
 
     @property
+    def user(self):
+        return self.project['user']
+
+    @property
     def project_path(self):
         return Path(self.project['path']).resolve()
 
@@ -76,10 +80,14 @@ class Odoox:
             subprocess.run(['docker', command] + options + [self.odoo_name])
         if command == 'ps':
             self.list_containers(options)
+        if command == 'images':
+            self.list_images(options)
 
     def list_containers(self, options):
         subprocess.run(['docker', 'ps', '-f', f"name={self.project_name}*"] + options)
 
+    def list_images(self, options):
+        subprocess.run(['docker', 'images'] + [f"{self.user}/{self.project_name}"] + options)
 
 if __name__ == '__main__':
     o = Odoox()

@@ -113,13 +113,16 @@ class Odoox:
         subprocess.run(['docker', 'ps', '-f', f"name={self.config.project_name}*"] + options)
 
     def list_images(self, options):
-        subprocess.run(['docker', 'images'] + [f"{self.config.user}/{self.config.project_name}"] + options)
+        subprocess.run(['docker', 'images'] + [f"{self.config.repo}"] + options)
 
     def remove_image(self, options):
-        tag = options[options.index('--rm')+1]
+        try:
+            tag = options[options.index('--rm')+1]
+            options.remove(tag)
+        except IndexError:
+            tag = 'latest'
         options.remove('--rm')
-        options.remove(tag)
-        command = ['docker', 'image', 'rm', '-f'] + [f"{self.config.user}/{self.config.project_name}:{tag}"] + options
+        command = ['docker', 'image', 'rm', '-f'] + [f"{self.config.repo}:{tag}"] + options
         subprocess.run(command)
 
 if __name__ == '__main__':

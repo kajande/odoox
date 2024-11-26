@@ -41,7 +41,7 @@ class Odoox:
         path = self.project_path
         if '-t' in options:
             t_index = options.index('-t')
-            tag = self.project['user'] + '/' + path.stem + ':' + options[t_index+1]
+            tag = self.project['user'] + '/' + path.stem + ':' + options.pop(t_index+1)
             options.insert(t_index+1, tag)
         else:
             tag = self.project['user'] + '/' + path.stem + ':latest'
@@ -53,7 +53,16 @@ class Odoox:
 
 
     def run(self, options):
-        tag = self.build(options)
+        if '-b' in options:
+            options.remove('-b')
+            tag = self.build(options)
+        elif '-t' in options:
+            t = options.pop(options.index('-t')+1)
+            tag = self.project['user'] + '/' + self.project_path.stem + f':{t}'
+        else:
+            t = 'latest'
+            tag = self.project['user'] + '/' + self.project_path.stem + f':{t}'
+
         pg_options = self.config['postgres']
         odoo_options = self.config['odoo']
         odoo_options['image'] = tag

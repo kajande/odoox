@@ -131,6 +131,12 @@ class Odoox:
         subprocess.run(['docker', 'image', 'tag'] +  [current_image, target_image] + options)
         print(f"tagged: {current_image} -> {target_image}")
 
+    def workon(self, tag, options):
+        target_tag = f"{self.config.repo}:{tag}"
+        latest_tag = f"{self.config.repo}:latest"
+        subprocess.run(['docker', 'image', 'tag'] +  [target_tag, latest_tag] + options)
+        print(f"working on: {target_tag}")
+
 if __name__ == '__main__':
     o = Odoox()
     o.execute('start')

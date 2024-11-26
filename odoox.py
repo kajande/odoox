@@ -49,13 +49,14 @@ class Odoox:
             options.append(tag)
         options.append(str(path))
         subprocess.run(['docker', 'buildx', 'build'] + options)
+        return tag
 
 
     def run(self, options):
-        self.build(options)
+        tag = self.build(options)
         pg_options = self.config['postgres']
         odoo_options = self.config['odoo']
-        odoo_options['image'] = options[options.index('-t')+1]
+        odoo_options['image'] = tag
         
         pg_options['name'] = self.pg_name
         odoo_options['name'] = self.odoo_name

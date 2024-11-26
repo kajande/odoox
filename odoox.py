@@ -25,15 +25,19 @@ class Odoox:
 
 
     def run(self, options):
+        port = ''
         if '-b' in options:
             options.remove('-b')
             tag = self.build(options)
+            port = self.config.odoo_version[:2]
         elif '-t' in options:
             t = options.pop(options.index('-t')+1)
             tag = self.config.project['user'] + '/' + self.config.project_path.stem + f':{t}'
+            port = t[:2]
         else:
             t = 'latest'
             tag = self.config.project['user'] + '/' + self.config.project_path.stem + f':{t}'
+            port = self.config.odoo_version[:2]
 
         pg_options = self.config['postgres']
         odoo_options = self.config['odoo']
@@ -44,6 +48,8 @@ class Odoox:
         odoo_options['links'] = {
             self.config.pg_name: 'db'
         }
+        # set port for current image (--dev mode)
+        odoo_options['ports']['8069/tcp'] = f"{port}69"
 
         pg = self.client.containers.run(**pg_options)
         print(f"{self.config.pg_name}: {pg.id}")
@@ -53,6 +59,7 @@ class Odoox:
         if not odoo_options['detach']:
             for log in odoo:
                 print(log.get("stream", "").strip())
+        print(f"Go to http://localhost:{port}69/")
 
 
     def execute(self, command, options, pg=False, odoo=False):
@@ -105,6 +112,9 @@ class Odoox:
                 odoo_options['links'] = {
                     self.config.pg_name: 'db'
                 }
+                port = self.config.odoo_version[:2]
+                # set port for current image (--dev mode)
+                odoo_options['ports']['8069/tcp'] = f"{port}69"
                 odoo_container = self.client.containers.run(**odoo_options)
                 print(f"{self.config.odoo_name}: {odoo_container.id}")
 
@@ -136,6 +146,11 @@ class Odoox:
         latest_tag = f"{self.config.repo}:latest"
         subprocess.run(['docker', 'image', 'tag'] +  [target_tag, latest_tag] + options)
         print(f"working on: {target_tag}")
+        """
+        TODO: handle port.
+        When this is called the current default (latest) image changes
+        but the port that should correspond does not update.
+        """
 
 if __name__ == '__main__':
     o = Odoox()

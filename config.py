@@ -40,7 +40,14 @@ class Config:
     def odoo_name(self):
         return self.project_name + '_odoo'
 
+    @property
+    def odoo_version(self):
+        with open(self.project_path/'Dockerfile') as dockerfile:
+            content = dockerfile.read()
+            oi = content.find('odoo')
+            version = content[oi:oi+len('odoo:xx')].split(':')[-1]
+            return version
+
 if __name__ == '__main__':
     config = Config()
-    import ipdb;ipdb.set_trace()
-    print(config['odoo'])
+    print(config.odoo_version)

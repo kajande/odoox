@@ -38,7 +38,7 @@ class Odoox:
         if '-t' in options:
             t_index = options.index('-t')
             tag = self.project['user'] + '/' + path.stem + ':' + options[t_index+1]
-            options[t_index+1] = tag
+            options.insert(t_index+1, tag)
         else:
             tag = self.project['user'] + '/' + path.stem + ':latest'
             options.append('-t')

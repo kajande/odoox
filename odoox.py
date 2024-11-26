@@ -74,6 +74,8 @@ class Odoox:
         if '-g' in options: options.remove('-g')
         if '--odoo' in options: options.remove('--odoo')
         if '-o' in options: options.remove('-o')
+        if command == 'rm':
+            options = ['-vf'] + options
         if pg:
             subprocess.run(['docker', command] + options + [self.pg_name])
         if odoo:

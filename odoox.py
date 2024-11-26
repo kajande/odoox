@@ -18,6 +18,10 @@ class Odoox:
         return self.project['user']
 
     @property
+    def repo(self):
+        return f"{self.user}/{self.project_name}"
+
+    @property
     def project_path(self):
         return Path(self.project['path']).resolve()
 
@@ -76,6 +80,9 @@ class Odoox:
         if '-o' in options: options.remove('-o')
         if '-og' in options: options.remove('-og')
         if '-go' in options: options.remove('-go')
+        if command == 'start':
+            self.start_container(pg, odoo, options)
+            return
         if command == 'rm':
             options = ['-vf'] + options
         if pg:
@@ -89,6 +96,36 @@ class Odoox:
                 self.remove_image(options)
         if command == 'images':
             self.list_images(options)
+
+    def start_container(self, pg, odoo, options):
+        if pg:
+            pg_exists = self.client.containers.list(all=True, filters={
+                'name': f"{self.project_name}_pg"
+            })
+            if pg_exists:
+                subprocess.run(['docker', 'start'] + [pg_exists[0].id] + options)
+            else:
+                pg_options = self.config['postgres']
+                pg_options['name'] = self.pg_name
+                pg = self.client.containers.run(**pg_options)
+                print(f"{self.pg_name}: {pg.id}")
+
+        if odoo:
+            odoo_exists = self.client.containers.list(all=True, filters={
+                'name': f"{self.project_name}_odoo"
+            })
+            if odoo_exists:
+                subprocess.run(['docker', 'start'] + [odoo_exists[0].id] + options)
+            else:
+                odoo_options = self.config['odoo']
+                odoo_options['image'] = f"{self.repo}:latest"
+                odoo_options['name'] = self.odoo_name
+                odoo_options['links'] = {
+                    self.pg_name: 'db'
+                }
+                odoo_container = self.client.containers.run(**odoo_options)
+                print(f"{self.odoo_name}: {odoo_container.id}")
+
 
     def list_containers(self, options):
         subprocess.run(['docker', 'ps', '-f', f"name={self.project_name}*"] + options)

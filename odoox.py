@@ -74,6 +74,11 @@ class Odoox:
             subprocess.run(['docker', command] + options + [self.pg_name])
         if odoo:
             subprocess.run(['docker', command] + options + [self.odoo_name])
+        if command == 'ps':
+            self.list_containers(options)
+
+    def list_containers(self, options):
+        subprocess.run(['docker', 'ps', '-f', f"name={self.project_name}*"] + options)
 
 
 if __name__ == '__main__':

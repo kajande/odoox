@@ -125,6 +125,12 @@ class Odoox:
         command = ['docker', 'image', 'rm', '-f'] + [f"{self.config.repo}:{tag}"] + options
         subprocess.run(command)
 
+    def tag(self, tag, options):
+        current_image = f"{self.config.repo}:latest"
+        target_image = f"{self.config.repo}:{tag}"
+        subprocess.run(['docker', 'image', 'tag'] +  [current_image, target_image] + options)
+        print(f"tagged: {current_image} -> {target_image}")
+
 if __name__ == '__main__':
     o = Odoox()
     o.execute('start')

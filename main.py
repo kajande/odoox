@@ -18,6 +18,8 @@ elif args.command[0] == 'build':
     odoox.build(args.options)
 elif args.command[0] == 'run':
     odoox.run(args.options)
+elif args.command[0] == 'tag':
+    odoox.tag(args.command[1], args.options)
 else:
     pg, odoo = False, False
     if '--pg' in args.options or '-g' in args.options:

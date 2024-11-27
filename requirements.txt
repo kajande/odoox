@@ -1,0 +1,5 @@
+docker==7.1.0
+ipdb==0.13.13
+ipython==8.29.0
+PyYAML==6.0.2
+setuptools==75.6.0

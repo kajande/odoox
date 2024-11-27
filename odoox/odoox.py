@@ -1,11 +1,18 @@
 import docker
+from docker.errors import DockerException
 import subprocess
 
 from .config import Config
 
 class Odoox:
-    
-    client = docker.from_env()
+    try:
+        client = docker.from_env()
+        client.ping()
+    except DockerException as e:
+        print(f"Docker is not installed or not running: {e}")
+    except Exception as e:
+        print(f"Unexpected error: {e}")
+
     config = Config()
     
     def build(self, options):

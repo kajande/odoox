@@ -1,8 +1,7 @@
 import docker
 import subprocess
-from pathlib import Path
 
-from config import Config
+from .config import Config
 
 class Odoox:
     

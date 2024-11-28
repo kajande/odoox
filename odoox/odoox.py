@@ -91,6 +91,8 @@ class Odoox:
                 self.remove_image(options)
         if command == 'images':
             self.list_images(options)
+        if command == 'url':
+            print(f"Go to {self.get_url(options)}")
 
     def start_container(self, pg, odoo, options):
         if pg:
@@ -124,6 +126,12 @@ class Odoox:
                 odoo_container = self.client.containers.run(**odoo_options)
                 print(f"{self.config.odoo_name}: {odoo_container.id}")
 
+    def get_url(self, options):
+        container = self.client.containers.get(self.config.odoo_name)
+        ports = container.attrs['NetworkSettings']['Ports']
+        url = ports['8069/tcp'][0]['HostIp']
+        port = ports['8069/tcp'][0]['HostPort']
+        return f"http://{url}:{port}/"
 
     def list_containers(self, options):
         subprocess.run(['docker', 'ps', '-f', f"name={self.config.project_name}*"] + options)

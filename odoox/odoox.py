@@ -26,6 +26,7 @@ class Odoox:
             options.append('-t')
             options.append(tag)
         options.append(str(path))
+        options.extend(["--build-arg", f"PROJECT_NAME={self.config.project_name}"])
         subprocess.run(['docker', 'buildx', 'build'] + options)
         return tag
 
@@ -165,6 +166,14 @@ class Odoox:
         When this is called the current default (latest) image changes
         but the port that should correspond does not update.
         """
+
+    def get_into_odoo(self, options):
+        if '-g' in options:
+            options.remove('-g')
+            subprocess.run(f"docker exec -it {self.config.pg_name} bash".split() + options)
+        else:
+            subprocess.run(f"docker exec -it {self.config.odoo_name} bash".split() + options)
+
 
 if __name__ == '__main__':
     o = Odoox()

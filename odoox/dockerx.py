@@ -4,7 +4,7 @@ import subprocess
 
 from .config import Config
 
-class Odoox:
+class Dockerx:
     try:
         client = docker.from_env()
         client.ping()
@@ -176,5 +176,5 @@ class Odoox:
 
 
 if __name__ == '__main__':
-    o = Odoox()
+    o = Dockerx()
     o.execute('start')

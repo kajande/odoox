@@ -1,3 +1,5 @@
+import subprocess
+
 import configparser
 from pathlib import Path
 import shutil
@@ -51,12 +53,14 @@ def install_module(module, options):
 
         try:
             org, repo = pull_uri.split('/')[-2:]
+            repo = repo.replace('.git', '')
             source_path = BASE_DEPS_DIR.joinpath(org, repo, dep_module)
             dest_path = DEST_DIR / dep_module
 
+            # import ipdb;ipdb.set_trace()
             if not source_path.exists():
-                print(f"Error: Module path '{source_path}' does not exist.")
-                continue
+                subprocess.run(f"git clone {pull_uri} {BASE_DEPS_DIR/org/repo}".split())
+                # continue
 
             shutil.copytree(source_path, dest_path, dirs_exist_ok=True)
             print(f"Installed '{dep_module}'")

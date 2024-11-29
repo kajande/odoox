@@ -4,6 +4,7 @@ import configparser
 from pathlib import Path
 import shutil
 
+from .config import config
 
 def execute(commands, options):
     if '-i' in options:

@@ -46,6 +46,8 @@ class Config:
             oi = content.find('odoo')
             version = content[oi:oi+len('odoo:xx')].split(':')[-1]
             return version
+        
+config = Config()
 
 if __name__ == '__main__':
     config = Config()

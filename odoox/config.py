@@ -4,7 +4,7 @@ import yaml
 
 class Config:
     def __init__(self):
-        self.config_path = './config/odoox.yml'
+        self.config_path = './odoox.yml'
         with open(self.config_path, 'r') as file:
             self.config = yaml.safe_load(file)
 

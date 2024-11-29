@@ -9,6 +9,9 @@ def execute(commands, options):
     if '-i' in options:
         module = options[options.index('-i')+1]
         install_module(module, options)
+    if '--i' in options:
+        module = options[options.index('--i')+1]
+        uninstall_module(module, options) 
 
 def uninstall_dependency(dep_module, dest_dir):
     """
@@ -69,3 +72,24 @@ def install_module(module, options):
     # Finally install the parent module
     shutil.copytree(module_path, DEST_DIR/module_path, dirs_exist_ok=True)
     print(f"Installed '{module}'")
+
+def uninstall_module(module, options):
+    """
+    Uninstalls the specified module and its dependencies.
+    """
+    DEST_DIR = Path("/mnt/extra-addons")
+
+    module_path = Path(f"./{module}")
+    BASE_DEPS_DIR = Path("xaddons")
+
+    config = configparser.ConfigParser()
+    config.read(f"{module}/gitx.conf")
+
+    dep_modules = set(config.sections())
+
+    # Uninstall dependencies recursively
+    for dep_module in dep_modules:
+        uninstall_dependency(dep_module, DEST_DIR)
+
+    # Now uninstall the main module
+    uninstall_dependency(module, DEST_DIR)

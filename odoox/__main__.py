@@ -2,16 +2,15 @@ import argparse
 import subprocess
 
 from odoox import Odoox
+from odoox import modules
 
 def main():
-
     parser = argparse.ArgumentParser()
 
     parser.add_argument('command', nargs="*")
     parser.add_argument('options', nargs=argparse.REMAINDER)
 
     args = parser.parse_args()
-
     odoox = Odoox()
 
     if args.command[0] == 'docker':
@@ -24,6 +23,10 @@ def main():
         odoox.tag(args.command[1], args.options)
     elif args.command[0] == 'workon':
         odoox.workon(args.command[1], args.options)
+    elif args.command[0] == 'in':
+        odoox.get_into_odoo(args.options)
+    elif args.command[0] == 'm':
+        modules.execute(args.command[1:], args.options)
     else:
         pg, odoo = False, False
         if '--pg' in args.options or '-g' in args.options:

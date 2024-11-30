@@ -62,6 +62,17 @@ class Dockerx:
         # set port for current image (--dev mode)
         odoo_options['ports']['8069/tcp'] = f"{port}69"
 
+        odoo_options['volumes'] = {
+            str(self.config.project_path): {
+                'bind': f"/{self.config.project_name}",
+                'mode': 'rw',
+            },
+            str(self.config.project_path/"odoo.conf"): {
+                'bind': "/etc/odoo/odoo.conf",
+                'mode': 'rw',
+            },
+        }
+
         pg = self.client.containers.run(**pg_options)
         print(f"{self.config.pg_name}: {pg.id}")
         odoo = self.client.containers.run(**odoo_options)

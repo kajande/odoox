@@ -20,14 +20,16 @@ class Dockerx:
         path = self.config.project_path
         if '-t' in options:
             t_index = options.index('-t')
-            tag = self.config.project['user'] + '/' + path.stem + ':' + options.pop(t_index+1)
+            tag = self.config.project['user']['user'] + '/' + path.stem + ':' + options.pop(t_index+1)
             options.insert(t_index+1, tag)
         else:
-            tag = self.config.project['user'] + '/' + path.stem + ':latest'
+            tag = self.config.project['user']['user'] + '/' + path.stem + ':latest'
             options.append('-t')
             options.append(tag)
         options.append(str(path))
         options.extend(["--build-arg", f"PROJECT_NAME={self.config.project_name}"])
+        options.extend(["--build-arg", f"USER_NAME={self.config.user_name}"])
+        options.extend(["--build-arg", f"USER_EMAIL={self.config.user_email}"])
         options.extend(["--build-arg", f"CACHE_BUST={time.time()}"])
         subprocess.run(['docker', 'buildx', 'build'] + options)
         return tag
@@ -41,11 +43,11 @@ class Dockerx:
             port = self.config.odoo_version[:2]
         elif '-t' in options:
             t = options.pop(options.index('-t')+1)
-            tag = self.config.project['user'] + '/' + self.config.project_path.stem + f':{t}'
+            tag = self.config.project['user']['user'] + '/' + self.config.project_path.stem + f':{t}'
             port = t[:2]
         else:
             t = 'latest'
-            tag = self.config.project['user'] + '/' + self.config.project_path.stem + f':{t}'
+            tag = self.config.project['user']['user'] + '/' + self.config.project_path.stem + f':{t}'
             port = self.config.odoo_version[:2]
 
         pg_options = self.config['postgres']

@@ -17,7 +17,7 @@ class Config:
 
     @property
     def user(self):
-        return self.project['user']
+        return self.project['user']['user']
 
     @property
     def repo(self):
@@ -46,6 +46,14 @@ class Config:
             oi = content.find('odoo')
             version = content[oi:oi+len('odoo:xx')].split(':')[-1]
             return version
+
+    @property
+    def user_name(self):
+        return self.project['user']['name']
+
+    @property
+    def user_email(self):
+        return self.project['user']['email']
         
 config = Config()
 

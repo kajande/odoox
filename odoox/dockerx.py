@@ -1,6 +1,7 @@
 import docker
 from docker.errors import DockerException
 import subprocess
+import time
 
 from .config import Config
 
@@ -27,6 +28,7 @@ class Dockerx:
             options.append(tag)
         options.append(str(path))
         options.extend(["--build-arg", f"PROJECT_NAME={self.config.project_name}"])
+        options.extend(["--build-arg", f"CACHE_BUST={time.time()}"])
         subprocess.run(['docker', 'buildx', 'build'] + options)
         return tag
 

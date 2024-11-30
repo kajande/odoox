@@ -7,17 +7,7 @@ class PG:
         self.port = 5432
         self.dbname = 'test17'
         self.user = 'odoo'
-        self.password = 'odoo'
-
-    def execute(self, cursor, query):
-        cursor.execute(query)
-        if query.strip().lower().startswith("select"):
-            results = cursor.fetchall()
-            for row in results:
-                print(f"\n{row}\n")
-        else:
-            conn.commit()
-        cursor.close()
+        self.password = 'odoo' 
 
     def connect_and_execute(self, query):
         try:
@@ -30,15 +20,33 @@ class PG:
             )
             cursor = conn.cursor()
 
-            self.execute(cursor, query)
+            cursor.execute(query)
+            if query.strip().lower().startswith("select"):
+                results = cursor.fetchall()
+                for row in results:
+                    print(f"\n{row}\n")
+            else:
+                conn.commit()
+            cursor.close()
 
             conn.close()
 
         except psycopg2.Error as e:
             print(f"An error occurred: {e}")
 
+class Module(PG):
+    def uninstall(self, module):
+        query = f"""
+        DELETE FROM ir_module_module where name='{module}' AND state='uninstalled';
+        DELETE FROM ir_model_data WHERE module = 'base' AND name = 'module_{module}';
+        """
+        self.connect_and_execute(query)
+
 if __name__ == '__main__':
     pg = PG()
-    query = "SELECT name, state FROM ir_module_module where name='demo';"
+    query = "SELECT name, state FROM ir_module_module where name='demo' AND state='uninstalled';"
 
     pg.connect_and_execute(query)
+
+    # module = Module()
+    # module.uninstall('demo')

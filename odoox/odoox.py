@@ -5,6 +5,7 @@ from pathlib import Path
 import shutil
 
 from .config import config
+from .pgx import Module
 
 def execute(commands, options):
     if '-i' in options:
@@ -94,3 +95,6 @@ def uninstall_module(module, options):
 
     # Now uninstall the main module
     uninstall_dependency(module, DEST_DIR)
+
+    # Remove from postgres db
+    Module().uninstall(module)

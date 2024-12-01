@@ -14,6 +14,8 @@ def execute(commands, options):
     if '--i' in options:
         module = options[options.index('--i')+1]
         uninstall_module(module, options) 
+    if '-l' in options:
+        list(options)
 
 def uninstall_dependency(dep_module, dest_dir):
     """
@@ -99,3 +101,6 @@ def uninstall_module(module, options):
 
     # Remove from postgres db
     Module().uninstall(module)
+
+def list(options):
+    subprocess.run("ls /mnt/extra-addons".split())

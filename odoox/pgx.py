@@ -1,13 +1,16 @@
 import psycopg2
 from psycopg2 import sql
 
+from .config import config
+
 class PG:
     def __init__(self):
-        self.host = 'db'
-        self.port = 5432
-        self.dbname = 'test17'
-        self.user = 'odoo'
-        self.password = 'odoo' 
+        pg_connect = config['pg_connect']
+        self.host = pg_connect['host']
+        self.port = pg_connect['port']
+        self.dbname = pg_connect['dbname']
+        self.user = pg_connect['user']
+        self.password = pg_connect['password']
 
     def connect_and_execute(self, query):
         try:

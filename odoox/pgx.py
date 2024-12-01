@@ -37,7 +37,6 @@ class PG:
         except psycopg2.Error as e:
             print(f"An error occurred: {e}")
 
-class Module(PG):
     def uninstall(self, module):
         query = f"""
         DELETE FROM ir_module_module where name='{module}' AND state='uninstalled';
@@ -45,11 +44,8 @@ class Module(PG):
         """
         self.connect_and_execute(query)
 
+pg = PG()
+
 if __name__ == '__main__':
-    pg = PG()
     query = "SELECT name, state FROM ir_module_module where name='demo' AND state='uninstalled';"
-
     pg.connect_and_execute(query)
-
-    # module = Module()
-    # module.uninstall('demo')

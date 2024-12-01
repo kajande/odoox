@@ -5,7 +5,7 @@ from pathlib import Path
 import shutil
 
 from .config import config
-from .pgx import Module
+from .pgx import pg
 from . import gitx
 
 def execute(commands, options):
@@ -26,7 +26,7 @@ def uninstall_dependency(dep_module, dest_dir):
     if module_path.exists() and module_path.is_dir():
         try:
             shutil.rmtree(module_path)
-            Module().uninstall(dep_module)
+            pg.uninstall(dep_module)
             print(f"Uninstalled '{dep_module}'")
         except Exception as e:
             print(f"Error removing extra module '{dep_module}': {e}")
@@ -105,7 +105,7 @@ def uninstall_module(module, options):
     uninstall_dependency(module, DEST_DIR)
 
     # Remove from postgres db
-    Module().uninstall(module)
+    pg.uninstall(module)
 
 def list(options):
     subprocess.run("ls /mnt/extra-addons".split())

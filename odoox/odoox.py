@@ -23,6 +23,7 @@ def uninstall_dependency(dep_module, dest_dir):
     if module_path.exists() and module_path.is_dir():
         try:
             shutil.rmtree(module_path)
+            Module().uninstall(dep_module)
             print(f"Uninstalled '{dep_module}'")
         except Exception as e:
             print(f"Error removing extra module '{dep_module}': {e}")

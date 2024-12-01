@@ -6,6 +6,7 @@ import shutil
 
 from .config import config
 from .pgx import Module
+from . import gitx
 
 def execute(commands, options):
     if '-i' in options:
@@ -65,10 +66,14 @@ def install_module(module, options):
             source_path = BASE_DEPS_DIR.joinpath(org, repo, dep_module)
             dest_path = DEST_DIR / dep_module
 
-            # import ipdb;ipdb.set_trace()
             if not source_path.exists():
-                subprocess.run(f"git clone {pull_uri} {BASE_DEPS_DIR/org/repo}".split())
-                # continue
+                clone_args = {
+                    "repo_url": pull_uri,
+                    "branch": config[dep_module].get('track', 'main'),
+                    "commit_hash": config[dep_module].get('track', ''),
+                    "target_dir": BASE_DEPS_DIR/org/repo,
+                }
+                gitx.clone_and_checkout(**clone_args)
 
             shutil.copytree(source_path, dest_path, dirs_exist_ok=True)
             print(f"Installed '{dep_module}'")

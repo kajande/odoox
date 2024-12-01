@@ -102,10 +102,9 @@ class Dockerx:
             subprocess.run(['docker', command] + options + [self.config.odoo_name])
         if command == 'ps':
             self.list_containers(options)
-        if command == 'image':
+        if command == 'im':
             if '--rm' in options:
                 self.remove_image(options)
-        if command == 'images':
             self.list_images(options)
         if command == 'url':
             print(f"Go to {self.get_url(options)}")

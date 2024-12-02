@@ -25,8 +25,8 @@ def main():
         dockerx.workon(args.command[1], args.options)
     elif args.command[0] == 'in':
         dockerx.get_into_odoo(args.options)
-    elif args.command[0] == 'm':
-        odoox.execute(args.command[1:], args.options)
+    elif args.command[0] in ('m', 'p'):
+        odoox.execute(args.command, args.options)
     else:
         pg, odoo = False, False
         if '--pg' in args.options or '-g' in args.options:

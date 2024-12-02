@@ -8,15 +8,16 @@ from .config import config
 from .pgx import pg
 from . import gitx
 
-def execute(commands, options):
-    if '-i' in options:
-        module = options[options.index('-i')+1]
-        install_module(module, options)
-    if '--i' in options:
-        module = options[options.index('--i')+1]
-        uninstall_module(module, options) 
-    if '-l' in options:
-        list(options)
+def execute(command, options):
+    if command[0] == 'm':
+        if '-i' in options:
+            module = options[options.index('-i')+1]
+            install_module(module, options)
+        if '--i' in options:
+            module = options[options.index('--i')+1]
+            uninstall_module(module, options) 
+        if '-l' in options:
+            list(options)
 
 def uninstall_dependency(dep_module, dest_dir):
     """

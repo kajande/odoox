@@ -1,20 +1,12 @@
-import docker
-from docker.errors import DockerException
 import subprocess
 import time
 
 from .config import Config
 
 class Dockerx:
-    try:
-        client = docker.from_env()
-        client.ping()
-    except DockerException as e:
-        pass
-    except Exception as e:
-        print(f"Unexpected error: {e}")
 
     config = Config()
+    client = config.get_docker_client()
     
     def build(self, options):
         path = self.config.project_path

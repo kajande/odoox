@@ -10,6 +10,18 @@ class Config:
 
     def __getitem__(self, item):
         return self.config[item]      
+    
+    def get_docker_client(self):
+        try:
+            import docker
+            from docker.errors import DockerException
+            client = docker.from_env()
+            client.ping()
+            return client
+        except DockerException as e:
+            return False
+        except Exception as e:
+            print(f"Unexpected error: {e}")
 
     @property
     def project(self):
@@ -60,3 +72,4 @@ config = Config()
 if __name__ == '__main__':
     config = Config()
     print(config.odoo_version)
+    print(config.get_docker_client())

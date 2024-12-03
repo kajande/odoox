@@ -1,6 +1,10 @@
 # odoox
 Docker scripts for managing odoo project developpement lifecycle from developpement to testing and deployment to cloud.
 
+Odoo is a very database centric system, where virtually everything and every operation interacts with the database. In an environment like that, the probably of encountering inconsistencies in the database is very high. This is an issue every Odoo Developer meets while developing modules. Handling those inconsistencies manually may be time consuming and distracts the developer from focusing from the important part of his work which is to add new features and functionalities to the system.
+
+It is in that spirit that we decided to develop a tool that will help a lot in the development workflow of an Odoo project. Below are documented the main commands usefull in this process.
+
 ## Installation
 
 ```

@@ -1,20 +1,12 @@
-import docker
-from docker.errors import DockerException
 import subprocess
 import time
 
 from .config import Config
 
 class Dockerx:
-    try:
-        client = docker.from_env()
-        client.ping()
-    except DockerException as e:
-        pass
-    except Exception as e:
-        print(f"Unexpected error: {e}")
 
     config = Config()
+    docker = config.get_docker_client()
     
     def build(self, options):
         path = self.config.project_path
@@ -73,9 +65,9 @@ class Dockerx:
             },
         }
 
-        pg = self.client.containers.run(**pg_options)
+        pg = self.docker.containers.run(**pg_options)
         print(f"{self.config.pg_name}: {pg.id}")
-        odoo = self.client.containers.run(**odoo_options)
+        odoo = self.docker.containers.run(**odoo_options)
         print(f"{self.config.odoo_name}: {odoo.id}")
 
         if not odoo_options['detach']:
@@ -111,7 +103,7 @@ class Dockerx:
 
     def start_container(self, pg, odoo, options):
         if pg:
-            pg_exists = self.client.containers.list(all=True, filters={
+            pg_exists = self.docker.containers.list(all=True, filters={
                 'name': f"{self.config.project_name}_pg"
             })
             if pg_exists:
@@ -119,11 +111,11 @@ class Dockerx:
             else:
                 pg_options = self.config['postgres']
                 pg_options['name'] = self.config.pg_name
-                pg = self.client.containers.run(**pg_options)
+                pg = self.docker.containers.run(**pg_options)
                 print(f"{self.config.pg_name}: {pg.id}")
 
         if odoo:
-            odoo_exists = self.client.containers.list(all=True, filters={
+            odoo_exists = self.docker.containers.list(all=True, filters={
                 'name': f"{self.config.project_name}_odoo"
             })
             if odoo_exists:
@@ -138,11 +130,11 @@ class Dockerx:
                 port = self.config.odoo_version[:2]
                 # set port for current image (--dev mode)
                 odoo_options['ports']['8069/tcp'] = f"{port}69"
-                odoo_container = self.client.containers.run(**odoo_options)
+                odoo_container = self.docker.containers.run(**odoo_options)
                 print(f"{self.config.odoo_name}: {odoo_container.id}")
 
     def get_url(self, options):
-        container = self.client.containers.get(self.config.odoo_name)
+        container = self.docker.containers.get(self.config.odoo_name)
         ports = container.attrs['NetworkSettings']['Ports']
         url = ports['8069/tcp'][0]['HostIp']
         port = ports['8069/tcp'][0]['HostPort']

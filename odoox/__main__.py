@@ -2,7 +2,7 @@ import argparse
 import subprocess
 
 from odoox import Dockerx
-from odoox import odoox
+import odoox
 
 from .config import config
 

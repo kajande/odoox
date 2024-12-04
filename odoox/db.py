@@ -1,5 +1,6 @@
 import xmlrpc.client
 import subprocess
+import configparser
 
 from .config import config
 
@@ -8,15 +9,22 @@ def execute(command, options):
     odoo_name = config.odoo_name
     db_name = command[0]
     if '-c' in options:
+        options.remove('-c')
         if not docker:
             create_db(db_name, options)
-            options.remove('-c')
         else:
             subprocess.run(f"docker exec -it {odoo_name} odoox db {db_name} -c".split())
-    if '-d' in options:
+    elif '-s' in options:
+        options.remove('-s')
+        if not docker:
+            select_db(db_name, options)
+        else:
+            subprocess.run(f"docker exec -it {odoo_name} odoox db {db_name} -s".split())
+            subprocess.run("odoox restart -o".split())
+    elif '-d' in options:
+        options.remove('-d')
         if not docker:
             delete_db(db_name, options)
-            options.remove('-d')
         else:
             subprocess.run(f"docker exec -it {odoo_name} odoox db {db_name} -d".split())
 
@@ -56,3 +64,20 @@ def delete_db(db_name, options):
         print(f"Database '{db_name}' deleted successfully.")
     except xmlrpc.client.Fault as e:
         print(f"Error occurred: {e.faultString}")
+
+def select_db(db_name, options):
+    odoo_conf = configparser.ConfigParser()
+    if config.get_docker_client():
+        config_file = "./odoo.conf"
+    else:
+        config_file = "/etc/odoo/odoo.conf"
+    try:
+        odoo_conf.read(config_file)
+        odoo_conf['options']['db_name'] = db_name
+
+        # Write the changes back to the file
+        with open(config_file, 'w') as file:
+            odoo_conf.write(file)
+        print(f"Database '{db_name}' selected successfully.")
+    except Exception as e:
+        print(e)

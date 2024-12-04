@@ -173,10 +173,10 @@ class Dockerx:
         but the port that should correspond does not update.
         """
 
-    def get_into_odoo(self, options):
+    def get_into_container(self, options):
         if '-g' in options:
             options.remove('-g')
-            subprocess.run(f"docker exec -it {self.config.pg_name} bash".split() + options)
+            subprocess.run(f"docker exec -it {self.config.pg_name} psql -U odoo -d postgres".split() + options)
         else:
             subprocess.run(f"docker exec -it {self.config.odoo_name} bash".split() + options)
 

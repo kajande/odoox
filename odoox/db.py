@@ -27,6 +27,12 @@ def execute(command, options):
             delete_db(db_name, options)
         else:
             subprocess.run(f"docker exec -it {odoo_name} odoox db {db_name} -d".split())
+    elif '-l' in options:
+        options.remove('-l')
+        if not docker:
+            list_db(db_name)
+        else:
+            subprocess.run(f"docker exec -it {odoo_name} odoox db {db_name} -l".split())
 
 def create_db(db_name, options):
     host = "localhost"
@@ -81,3 +87,34 @@ def select_db(db_name, options):
         print(f"Database '{db_name}' selected successfully.")
     except Exception as e:
         print(e)
+
+
+def list_db(owner):
+    """
+    List databases with the specified owner.
+    :param owner: The owner is the current project name.
+    """
+    host = "localhost"
+    port = 8069
+    admin_password = "master"
+    url = f"http://{host}:{port}/xmlrpc/2/db"
+    db_proxy = xmlrpc.client.ServerProxy(url)
+
+    try:
+        # Fetch all databases
+        databases = db_proxy.list(admin_password)
+
+        # Placeholder for filtering (replace with actual filtering logic if available)
+        filtered_dbs = [
+            db for db in databases
+            if db.startswith(owner)  # Assuming owner-based filtering logic
+        ]
+
+        import ipdb;ipdb.set_trace()
+
+        for db in filtered_dbs:
+            print(db)
+        # return filtered_dbs
+    except xmlrpc.client.Fault as e:
+        print(f"Error occurred: {e.faultString}")
+        return []

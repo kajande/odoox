@@ -1,20 +1,31 @@
 from pathlib import Path
 import shutil
 import configparser
-
 import subprocess
+
+from .config import config
 from .pgx import pg
 
 def execute(command, options):
-    # subprocess.run(f"docker exec -it {odoo_name} odoox m {module} -i".split())
+    docker = config.get_docker_client()
+    odoo_name = config.odoo_name
     if '-i' in options:
         module = options[options.index('-i')+1]
-        install_module(module, options)
+        if not docker:
+            install_module(module, options)
+        else:
+            subprocess.run(f"docker exec -it {odoo_name} odoox m -i {module}".split())
     if '--i' in options:
         module = options[options.index('--i')+1]
-        uninstall_module(module, options) 
+        if not docker:
+            uninstall_module(module, options) 
+        else:
+            subprocess.run(f"docker exec -it {odoo_name} odoox m --i {module}".split())
     if '-l' in options:
-        list(options)
+        if not docker:
+            list(options)
+        else:
+            subprocess.run(f"docker exec -it {odoo_name} odoox m -l".split())
 
 def uninstall_dependency(dep_module, dest_dir):
     """

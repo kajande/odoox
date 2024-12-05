@@ -177,8 +177,8 @@ def activate_module(module, db, options):
         module_ids = module_model.search([('name', '=', module)])
         
         if not module_ids:
-            print(f"Module '{module}' not found.")
-            return
+            subprocess.run(f"odoox m -i {module}".split())
+            module_ids = module_model.search([('name', '=', module)])
         
         module_record = module_model.browse(module_ids[0])
         if module_record.state != 'installed':

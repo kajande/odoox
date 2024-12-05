@@ -13,6 +13,7 @@ from . import gitx
 def execute(command, options):
     docker = config.get_docker_client()
     odoo_name = config.odoo_name
+    db_name = odoo_conf['options']['db_name']
     if '-i' in options:
         module = options[options.index('-i')+1]
         if not docker:
@@ -30,6 +31,20 @@ def execute(command, options):
             list(options)
         else:
             subprocess.run(f"docker exec -it {odoo_name} odoox m -l".split())
+    
+    if '-a' in options:
+        module = command[0]
+        if not docker:
+            activate_module(module, db_name, options)
+        else:
+            subprocess.run(f"docker exec -it {odoo_name} odoox m {module} -a".split())
+
+    if '--a' in options:
+        module = command[0]
+        if not docker:
+            deactivate_module(module, db_name, options)
+        else:
+            subprocess.run(f"docker exec -it {odoo_name} odoox m {module} --a".split())
 
 def uninstall_dependency(dep_module, dest_dir):
     """
@@ -149,3 +164,59 @@ def update_apps_list(db_name):
         print("Apps list updated.")
     except Exception as e:
         print(f"Error occurred: {e}")
+
+def activate_module(module, db, options):
+    host = "localhost"
+    port = 8069
+    admin_user = "admin"
+    admin_password = "admin"
+    try:
+        odoo = odoorpc.ODOO(host, port=port)        
+        odoo.login(db, admin_user, admin_password)        
+        module_model = odoo.env['ir.module.module']
+        module_ids = module_model.search([('name', '=', module)])
+        
+        if not module_ids:
+            print(f"Module '{module}' not found.")
+            return
+        
+        module_record = module_model.browse(module_ids[0])
+        if module_record.state != 'installed':
+            print(f"Installing module '{module}'...")
+            module_model.button_immediate_install([module_record.id])
+            print(f"Module '{module}' installed successfully.")
+        else:
+            print(f"Module '{module}' is already installed.")
+    
+    except odoorpc.error.RPCError as e:
+        print(f"An error occurred: {e}")
+    except Exception as e:
+        print(f"Unexpected error: {e}")
+
+def deactivate_module(module, db, options):
+    host = "localhost"
+    port = 8069
+    admin_user = "admin"
+    admin_password = "admin"
+    try:
+        odoo = odoorpc.ODOO(host, port=port)        
+        odoo.login(db, admin_user, admin_password)        
+        module_model = odoo.env['ir.module.module']        
+        module_ids = module_model.search([('name', '=', module)])
+        
+        if not module_ids:
+            print(f"Module '{module}' not found.")
+            return
+        
+        module_record = module_model.browse(module_ids[0])
+        if module_record.state == 'installed':
+            print(f"Uninstalling module '{module}'...")
+            module_model.button_immediate_uninstall([module_record.id])
+            print(f"Module '{module}' uninstalled successfully.")
+        else:
+            print(f"Module '{module}' is not installed or is already uninstalled.")
+    
+    except odoorpc.error.RPCError as e:
+        print(f"An error occurred: {e}")
+    except Exception as e:
+        print(f"Unexpected error: {e}")

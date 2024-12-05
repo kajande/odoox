@@ -48,6 +48,13 @@ def execute(command, options):
         else:
             subprocess.run(f"docker exec -it {odoo_name} odoox m {module} --a".split())
 
+    if '-u' in options:
+        options.remove('-u')
+        if not docker:
+            upgrade_module(module, db_name, options)
+        else:
+            subprocess.run(f"docker exec -it {odoo_name} odoox m {module} -u".split())
+
     if options:
             subprocess.run(f"odoox {' '.join(options)}".split())
 
@@ -225,3 +232,28 @@ def deactivate_module(module, db, options):
         print(f"An error occurred: {e}")
     except Exception as e:
         print(f"Unexpected error: {e}")
+
+def upgrade_module(module, db, options):
+    host = "localhost"
+    port = 8069
+    user = "admin"
+    password = "admin"
+    try:
+        odoo = odoorpc.ODOO(host, port=port)
+        odoo.login(db, user, password)
+
+        module_model = odoo.env['ir.module.module']
+
+        module_ids = module_model.search([('name', '=', module)])
+        if not module_ids:
+            print(f"Module '{module}' not found.")
+            return
+
+        print(f"Upgrading module '{module}'...")
+        module_model.button_immediate_upgrade(module_ids)
+        print(f"Module '{module}' upgraded successfully.")
+
+    except odoorpc.error.RPCError as e:
+        print(f"An error occurred while upgrading the module: {e}")
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")

@@ -6,6 +6,7 @@ import subprocess
 import odoorpc
 
 from .config import config
+from .odoo_conf import odoo_conf
 from .pgx import pg
 from . import gitx
 
@@ -93,8 +94,8 @@ def install_module(module, options):
             print(f"Error processing module '{dep_module}': {e}")
     # Finally install the parent module
     shutil.copytree(module_path, DEST_DIR/module_path, dirs_exist_ok=True)
-    update_apps_list("test11")
     print(f"Installed '{module}'")
+    update_apps_list(odoo_conf['options']['db_name'])
 
 def uninstall_module(module, options):
     """
@@ -141,17 +142,10 @@ def update_apps_list(db_name):
     username = "admin"
     password = "admin"
     try:
-        # Connect to the Odoo server
         odoo = odoorpc.ODOO(host, port=port)
-
-        # Authenticate to the Odoo database
         odoo.login(database, username, password)
-
-        # Get the `ir.module.module` model
         module_model = odoo.env['ir.module.module']
-
-        # Call the `update_list` method
         module_model.update_list()
-        print("Apps list updated successfully.")
+        print("Apps list updated.")
     except Exception as e:
         print(f"Error occurred: {e}")

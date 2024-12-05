@@ -16,32 +16,40 @@ def execute(command, options):
     db_name = odoo_conf['options']['db_name']
     module = command[0]
     if '-i' in options:
+        options.remove('-i')
         if not docker:
             install_module(module, options)
         else:
             subprocess.run(f"docker exec -it {odoo_name} odoox m {module} -i".split())
     if '--i' in options:
+        options.remove('--i')
         if not docker:
             uninstall_module(module, options) 
         else:
             subprocess.run(f"docker exec -it {odoo_name} odoox m {module} --i".split())
     if '-l' in options:
+        options.remove('-l')
         if not docker:
             list(options)
         else:
             subprocess.run(f"docker exec -it {odoo_name} odoox m {module} -l".split())
     
     if '-a' in options:
+        options.remove('-a')
         if not docker:
             activate_module(module, db_name, options)
         else:
             subprocess.run(f"docker exec -it {odoo_name} odoox m {module} -a".split())
 
     if '--a' in options:
+        options.remove('--a')
         if not docker:
             deactivate_module(module, db_name, options)
         else:
             subprocess.run(f"docker exec -it {odoo_name} odoox m {module} --a".split())
+
+    if options:
+            subprocess.run(f"odoox {' '.join(options)}".split())
 
 def uninstall_dependency(dep_module, dest_dir):
     """

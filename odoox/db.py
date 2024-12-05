@@ -8,19 +8,19 @@ def execute(command, options):
     docker = config.get_docker_client()
     odoo_name = config.odoo_name
     db_name = command[0]
-    if '-c' in options:
-        options.remove('-c')
-        if not docker:
-            create_db(db_name, options)
-        else:
-            subprocess.run(f"docker exec -it {odoo_name} odoox db {db_name} -c".split())
-    elif '-s' in options:
-        options.remove('-s')
+    if '-s' in options or not '-s' in options:
+        if '-s' in options: options.remove('-s')
         if not docker:
             select_db(db_name, options)
         else:
             subprocess.run(f"docker exec -it {odoo_name} odoox db {db_name} -s".split())
             subprocess.run("odoox restart -o".split())
+    elif '-c' in options:
+        options.remove('-c')
+        if not docker:
+            create_db(db_name, options)
+        else:
+            subprocess.run(f"docker exec -it {odoo_name} odoox db {db_name} -c".split())
     elif '-d' in options:
         options.remove('-d')
         if not docker:
@@ -33,6 +33,10 @@ def execute(command, options):
             list_db(db_name)
         else:
             subprocess.run(f"docker exec -it {odoo_name} odoox db {db_name} -l".split())
+    if options:
+        if '-c' in options or '-s' in options or '-d' in options:
+            subprocess.run(["odoox", "db"] + [db_name] + options)
+        subprocess.run(["odoox"] + command[1:] + options)
 
 def create_db(db_name, options):
     host = "localhost"

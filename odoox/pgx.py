@@ -1,14 +1,21 @@
 import psycopg2
 from psycopg2 import sql
+import configparser
 
 from .config import config
 
 class PG:
     def __init__(self):
+        odoo_conf = configparser.ConfigParser()
+        if config.get_docker_client():
+            odoo_conf.read('./odoo.conf')
+        else:
+            odoo_conf.read('/etc/odoo/odoo.conf')
+
         pg_connect = config['pg_connect']
         self.host = pg_connect['host']
         self.port = pg_connect['port']
-        self.dbname = pg_connect['dbname']
+        self.dbname = odoo_conf['options']['db_name']
         self.user = pg_connect['user']
         self.password = pg_connect['password']
 

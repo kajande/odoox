@@ -14,33 +14,30 @@ def execute(command, options):
     docker = config.get_docker_client()
     odoo_name = config.odoo_name
     db_name = odoo_conf['options']['db_name']
+    module = command[0]
     if '-i' in options:
-        module = options[options.index('-i')+1]
         if not docker:
             install_module(module, options)
         else:
-            subprocess.run(f"docker exec -it {odoo_name} odoox m -i {module}".split())
+            subprocess.run(f"docker exec -it {odoo_name} odoox m {module} -i".split())
     if '--i' in options:
-        module = options[options.index('--i')+1]
         if not docker:
             uninstall_module(module, options) 
         else:
-            subprocess.run(f"docker exec -it {odoo_name} odoox m --i {module}".split())
+            subprocess.run(f"docker exec -it {odoo_name} odoox m {module} --i".split())
     if '-l' in options:
         if not docker:
             list(options)
         else:
-            subprocess.run(f"docker exec -it {odoo_name} odoox m -l".split())
+            subprocess.run(f"docker exec -it {odoo_name} odoox m {module} -l".split())
     
     if '-a' in options:
-        module = command[0]
         if not docker:
             activate_module(module, db_name, options)
         else:
             subprocess.run(f"docker exec -it {odoo_name} odoox m {module} -a".split())
 
     if '--a' in options:
-        module = command[0]
         if not docker:
             deactivate_module(module, db_name, options)
         else:

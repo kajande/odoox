@@ -100,10 +100,27 @@ class Config:
     @property
     def user_email(self):
         return self.project['user']['email']
+    
+    def generate_postgres_options(self):
+        options = self.config['postgres']
+        cmd = []
+        if options.get("detach", False):
+            cmd.append("-d")
+        environment = options.get("environment", {})
+        for key, value in environment.items():
+            cmd.append(f'-e "{key}={value}"')
+        cmd.append(f'--name {self.pg_name}')
+        image = options.get("image")
+        if image:
+            cmd.append(image)
+        return " ".join(cmd)
+
         
 config = Config()
 
 if __name__ == '__main__':
     config = Config()
-    print(config.odoo_version)
-    print(config.get_docker_client())
+    command = config.generate_postgres_options()
+    print(command)
+    # print(config.odoo_version)
+    # print(config.get_docker_client())

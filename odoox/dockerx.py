@@ -42,11 +42,10 @@ class Dockerx:
             tag = self.config.project['user']['user'] + '/' + self.config.project_path.stem + f':{t}'
             port = self.config.odoo_version[:2]
 
-        pg_options = self.config['postgres']
+        pg_options = self.config.generate_postgres_options()
         odoo_options = self.config['odoo']
         odoo_options['image'] = tag
         
-        pg_options['name'] = self.config.pg_name
         odoo_options['name'] = self.config.odoo_name
         odoo_options['links'] = {
             self.config.pg_name: 'db'
@@ -65,14 +64,11 @@ class Dockerx:
             },
         }
 
-        pg = self.docker.containers.run(**pg_options)
-        print(f"{self.config.pg_name}: {pg.id}")
-        odoo = self.docker.containers.run(**odoo_options)
-        print(f"{self.config.odoo_name}: {odoo.id}")
+        pg_command = "docker run" + pg_options
+        subprocess.run(pg_command.split())
+        odoo_command = "docker run" + odoo_options
+        subprocess.run(odoo_command.split())
 
-        if not odoo_options['detach']:
-            for log in odoo:
-                print(log.get("stream", "").strip())
         print(f"Go to http://localhost:{port}69/")
 
 

@@ -3,8 +3,11 @@ import shutil
 import configparser
 import subprocess
 
+import odoorpc
+
 from .config import config
 from .pgx import pg
+from . import gitx
 
 def execute(command, options):
     docker = config.get_docker_client()
@@ -90,6 +93,7 @@ def install_module(module, options):
             print(f"Error processing module '{dep_module}': {e}")
     # Finally install the parent module
     shutil.copytree(module_path, DEST_DIR/module_path, dirs_exist_ok=True)
+    update_apps_list("test11")
     print(f"Installed '{module}'")
 
 def uninstall_module(module, options):
@@ -118,3 +122,36 @@ def uninstall_module(module, options):
 
 def list(options):
     subprocess.run("ls /mnt/extra-addons".split())
+
+
+
+def update_apps_list(db_name):
+    """
+    Update the Odoo apps list.
+
+    :param host: Host where Odoo is running (e.g., "localhost").
+    :param port: Port where Odoo is running (e.g., 8069).
+    :param database: Name of the database to connect to.
+    :param username: Username for Odoo authentication.
+    :param password: Password for Odoo authentication.
+    """
+    host = "localhost"
+    port = 8069
+    database = db_name
+    username = "admin"
+    password = "admin"
+    try:
+        # Connect to the Odoo server
+        odoo = odoorpc.ODOO(host, port=port)
+
+        # Authenticate to the Odoo database
+        odoo.login(database, username, password)
+
+        # Get the `ir.module.module` model
+        module_model = odoo.env['ir.module.module']
+
+        # Call the `update_list` method
+        module_model.update_list()
+        print("Apps list updated successfully.")
+    except Exception as e:
+        print(f"Error occurred: {e}")

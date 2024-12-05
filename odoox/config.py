@@ -1,12 +1,46 @@
 from pathlib import Path
-import yaml
-
 
 class Config:
     def __init__(self):
-        self.config_path = './odoox.yml'
-        with open(self.config_path, 'r') as file:
-            self.config = yaml.safe_load(file)
+        self.config = dict()
+        project = {
+            'path': '.', 
+            'user': {
+                'user': 'user', 
+                'name': 'Moctar Diallo', 
+                'email': 'moctarjallo@gmail.com'
+            }
+        }
+        postgres = {
+            'image': 'postgres:15', 
+            'detach': True, 
+            'environment': {
+                'POSTGRES_USER': 'odoo', 
+                'POSTGRES_PASSWORD': 'odoo', 
+                'POSTGRES_DB': 'postgres'
+            }
+        }
+        odoo = {
+            'image': 'odoo', 
+            'detach': True, 
+            'stdout': True, 
+            'stream': True, 
+            'ports': {
+                '8069/tcp': 8069
+            }, 
+            'tty': True
+        }
+        pg_connect = {
+            'host': 'db', 
+            'port': 5432, 
+            'dbname': None, # from odoo_conf
+            'user': 'odoo', 
+            'password': 'odoo'
+        }
+        self.config['project'] = project
+        self.config['postgres'] = postgres
+        self.config['odoo'] = odoo
+        self.config['pg_connect'] = pg_connect
 
     def __getitem__(self, item):
         return self.config[item]      

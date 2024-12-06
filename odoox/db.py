@@ -12,8 +12,8 @@ def execute(command, options):
         db_name = command[0]
     except IndexError as ie:
         db_name = config.current_db
-    if '-s' in options or not '-s' in options:
-        if '-s' in options: options.remove('-s')
+    if '-s' in options :
+        options.remove('-s')
         if not docker:
             select_db(db_name, options)
         else:
@@ -41,7 +41,7 @@ def execute(command, options):
     elif '--debug' in options:
         options.remove('--debug')
         if not docker:
-            debug_db(db_name)
+            debug_db(db_name, options)
         else:
             subprocess.run(f"docker exec -it {odoo_name} odoox db {db_name} --debug".split())
     if options:
@@ -142,6 +142,8 @@ def debug_db(db, options):
     try:
         odoo = odoorpc.ODOO(host, port=port)
         odoo.login(db, user, password)
+
+        Module = odoo.env['ir.module.module']
 
         import ipdb;ipdb.set_trace()
 

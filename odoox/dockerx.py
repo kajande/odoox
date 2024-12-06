@@ -42,31 +42,15 @@ class Dockerx:
             tag = self.config.project['user']['user'] + '/' + self.config.project_path.stem + f':{t}'
             port = self.config.odoo_version[:2]
 
-        pg_options = self.config.generate_postgres_options()
+        pg_options = self.config.generate_postgres_options(options)
         odoo_options = self.config['odoo']
         odoo_options['image'] = tag
-        
-        odoo_options['name'] = self.config.odoo_name
-        odoo_options['links'] = {
-            self.config.pg_name: 'db'
-        }
-        # set port for current image (--dev mode)
-        odoo_options['ports']['8069/tcp'] = f"{port}69"
 
-        odoo_options['volumes'] = {
-            str(self.config.project_path): {
-                'bind': f"/{self.config.project_name}",
-                'mode': 'rw',
-            },
-            str(self.config.project_path/"odoo.conf"): {
-                'bind': "/etc/odoo/odoo.conf",
-                'mode': 'rw',
-            },
-        }
-
-        pg_command = "docker run" + pg_options
+        odoo_options_list = self.config.generate_odoo_options(tag, port, odoo_options)
+        if '-d' in options: odoo_options_list = '-d ' + odoo_options_list
+        pg_command = "docker run " + pg_options
+        odoo_command = "docker run " + odoo_options_list
         subprocess.run(pg_command.split())
-        odoo_command = "docker run" + odoo_options
         subprocess.run(odoo_command.split())
 
         print(f"Go to http://localhost:{port}69/")

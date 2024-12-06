@@ -11,6 +11,7 @@ class Config:
                 'email': 'moctarjallo@gmail.com'
             }
         }
+        self.config['project'] = project
         postgres = {
             'image': 'postgres:15', 
             'detach': True, 
@@ -20,9 +21,10 @@ class Config:
                 'POSTGRES_DB': 'postgres'
             }
         }
+        self.config['postgres'] = postgres
         odoo = {
             'image': 'odoo', 
-            'detach': True, 
+            'detach': False,
             'stdout': True, 
             'stream': True, 
             'ports': {
@@ -30,6 +32,21 @@ class Config:
             }, 
             'tty': True
         }
+        odoo['volumes'] = {
+            str(self.project_path): {
+                'bind': f"/{self.project_name}",
+                'mode': 'rw',
+            },
+            str(self.project_path/"odoo.conf"): {
+                'bind': "/etc/odoo/odoo.conf",
+                'mode': 'rw',
+            },
+        }
+        odoo['name'] = self.odoo_name
+        odoo['links'] = {
+            self.pg_name: 'db'
+        }
+        self.config['odoo'] = odoo
         pg_connect = {
             'host': 'db', 
             'port': 5432, 
@@ -37,9 +54,6 @@ class Config:
             'user': 'odoo', 
             'password': 'odoo'
         }
-        self.config['project'] = project
-        self.config['postgres'] = postgres
-        self.config['odoo'] = odoo
         self.config['pg_connect'] = pg_connect
 
     def __getitem__(self, item):
@@ -101,26 +115,71 @@ class Config:
     def user_email(self):
         return self.project['user']['email']
     
-    def generate_postgres_options(self):
-        options = self.config['postgres']
+    def generate_postgres_options(self, options):
+        pg_options = self.config['postgres']
         cmd = []
-        if options.get("detach", False):
+        if pg_options.get("detach", False):
             cmd.append("-d")
-        environment = options.get("environment", {})
+        environment = pg_options.get("environment", {})
         for key, value in environment.items():
-            cmd.append(f'-e "{key}={value}"')
+            cmd.append(f'-e {key}={value}')
         cmd.append(f'--name {self.pg_name}')
-        image = options.get("image")
+        image = pg_options.get("image")
         if image:
             cmd.append(image)
         return " ".join(cmd)
 
-        
+    def generate_odoo_options(self, tag, port, options=None):
+        odoo_options = self.config['odoo']
+        cmd = []
+
+        # Handle detach mode
+        if odoo_options.get("detach", False) or '-d' in options:
+            cmd.append("-d")
+
+        # Handle ports
+        # set port for current image (--dev mode)
+        odoo_options['ports']['8069/tcp'] = f"{port}69"
+        ports = odoo_options.get("ports", {})
+        for container_port, host_port in ports.items():
+            cmd.append(f'-p {host_port}:{container_port.split("/")[0]}')
+
+        volumes = odoo_options.get("volumes", {})
+        for host_path, volume_details in volumes.items():
+            bind = volume_details.get("bind")
+            cmd.append(f'-v {host_path}:{bind}')
+
+        links = odoo_options.get("links", {})
+        for container_name, alias in links.items():
+            cmd.append(f'--link {container_name}:{alias}')
+
+        if odoo_options.get("tty", False):
+            cmd.append("--tty")
+
+        container_name = odoo_options.get("name")
+        if container_name:
+            cmd.append(f'--name {container_name}')
+
+        odoo_options['image'] = tag
+        image = odoo_options.get("image", "latest")
+        cmd.append(image)
+
+        return " ".join(cmd)
+
+
 config = Config()
 
 if __name__ == '__main__':
     config = Config()
-    command = config.generate_postgres_options()
+    # command = config.generate_postgres_options([])
+    # print(command)
+    tag = "latest"
+    port = 17
+
+    odoo_options = config['odoo']
+
+    command = config.generate_odoo_options(tag, port, config['odoo'])
     print(command)
+    import ipdb;ipdb.set_trace()
     # print(config.odoo_version)
     # print(config.get_docker_client())

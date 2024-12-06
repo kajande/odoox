@@ -388,13 +388,11 @@ class {name.capitalize()}(models.Model):
     <menuitem id="menu_{name}_main" name="{name.capitalize()}s" parent="menu_{name}" action="action_{name}"/>
 </odoo>
 """
-    # Set permissions to 777
-    for root, dirs, files in os.walk(f"./{name}"):
-        for dir_name in dirs:
-            os.chmod(Path(root) / dir_name, 0o777)
-        for file_name in files:
-            os.chmod(Path(root) / file_name, 0o777)
-    os.chmod(module_dir, 0o777)
     )
+    # Set permissions to 777
+    for path in module_dir.rglob("*"):
+        path.chmod(0o777)
+
+    module_dir.chmod(0o777)
 
     print(f"Module '{name}' created successfully.")

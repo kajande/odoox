@@ -12,7 +12,8 @@ def execute(command, options):
         db_name = command[0]
     except IndexError as ie:
         db_name = config.current_db
-    if '-s' in options :
+    import ipdb;ipdb.set_trace()
+    if '-s' in options:
         options.remove('-s')
         if not docker:
             select_db(db_name, options)

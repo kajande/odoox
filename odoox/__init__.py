@@ -7,4 +7,5 @@ def execute(command, options):
     if command[0] == 'm':
         module.execute(command[1:], options)
     if command[0] == 'db':
+        import ipdb;ipdb.set_trace()
         db.execute(command[1:], options)

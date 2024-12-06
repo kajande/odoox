@@ -1,4 +1,5 @@
 from pathlib import Path
+import configparser
 
 class Config:
     def __init__(self):
@@ -55,6 +56,13 @@ class Config:
             'password': 'odoo'
         }
         self.config['pg_connect'] = pg_connect
+
+        self.odoo_conf = configparser.ConfigParser()
+        if self.get_docker_client():
+            odoo_conf_file = './odoo.conf'
+        else:
+            odoo_conf_file = '/etc/odoo/odoo.conf'
+        self.odoo_conf.read(odoo_conf_file)
 
     def __getitem__(self, item):
         return self.config[item]      
@@ -114,6 +122,10 @@ class Config:
     @property
     def user_email(self):
         return self.project['user']['email']
+    
+    @property
+    def current_db(self):
+        return self.odoo_conf['options']['db_name']
     
     def generate_postgres_options(self, options):
         pg_options = self.config['postgres']

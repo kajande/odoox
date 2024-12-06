@@ -1,4 +1,5 @@
 import xmlrpc.client
+import odoorpc
 import subprocess
 import configparser
 
@@ -7,7 +8,10 @@ from .config import config
 def execute(command, options):
     docker = config.get_docker_client()
     odoo_name = config.odoo_name
-    db_name = command[0]
+    try:
+        db_name = command[0]
+    except IndexError as ie:
+        db_name = config.current_db
     if '-s' in options or not '-s' in options:
         if '-s' in options: options.remove('-s')
         if not docker:
@@ -33,6 +37,13 @@ def execute(command, options):
             list_db(db_name)
         else:
             subprocess.run(f"docker exec -it {odoo_name} odoox db {db_name} -l".split())
+
+    elif '--debug' in options:
+        options.remove('--debug')
+        if not docker:
+            debug_db(db_name)
+        else:
+            subprocess.run(f"docker exec -it {odoo_name} odoox db {db_name} --debug".split())
     if options:
         if '-c' in options or '-s' in options or '-d' in options:
             subprocess.run(["odoox", "db"] + [db_name] + options)
@@ -122,3 +133,19 @@ def list_db(owner):
     except xmlrpc.client.Fault as e:
         print(f"Error occurred: {e.faultString}")
         return []
+
+def debug_db(db, options):
+    host = "localhost"
+    port = 8069
+    user = "admin"
+    password = "admin"
+    try:
+        odoo = odoorpc.ODOO(host, port=port)
+        odoo.login(db, user, password)
+
+        import ipdb;ipdb.set_trace()
+
+    except odoorpc.error.RPCError as e:
+        print(f"An error occurred while upgrading the module: {e}")
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")

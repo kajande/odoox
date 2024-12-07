@@ -1,6 +1,5 @@
 import subprocess
-
-import subprocess
+from pathlib import Path
 
 def clone_and_checkout(repo_url, branch=None, commit_hash=None, target_dir="."):
     """
@@ -40,3 +39,10 @@ def clone_and_checkout(repo_url, branch=None, commit_hash=None, target_dir="."):
     except subprocess.CalledProcessError as e:
         print(f"Error: {e}")
         raise
+
+def set_user_permission(dir_name, permission):
+    # Set permissions to 777
+    module_dir = Path(dir_name)
+    for path in module_dir.rglob("*"):
+        path.chmod(permission)
+    module_dir.chmod(permission)

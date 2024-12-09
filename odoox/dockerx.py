@@ -100,6 +100,7 @@ class Dockerx:
             })
             if odoo_exists:
                 subprocess.run(['docker', 'start'] + [odoo_exists[0].id] + options)
+                subprocess.run(f"docker logs -f {self.config.odoo_name}".split())
             else:
                 odoo_options = self.config['odoo']
                 odoo_options['image'] = f"{self.config.repo}:latest"

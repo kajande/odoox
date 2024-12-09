@@ -66,6 +66,9 @@ class Dockerx:
         if command == 'start':
             self.start_container(pg, odoo, options)
             return
+        if command == 'restart':
+            self.restart_container(pg, odoo, options)
+            return
         if command == 'rm':
             options = ['-vf'] + options
         if pg:
@@ -113,6 +116,14 @@ class Dockerx:
                 odoo_options['ports']['8069/tcp'] = f"{port}69"
                 odoo_container = self.docker.containers.run(**odoo_options)
                 print(f"{self.config.odoo_name}: {odoo_container.id}")
+            
+    def restart_container(self, pg, odoo, options):
+        if pg:
+            subprocess.run(f"docker restart {self.config.pg_name}".split() + options)
+            subprocess.run(f"docker logs -f {self.config.pg_name}".split() + options)
+        if odoo:
+            subprocess.run(f"docker restart {self.config.odoo_name}".split() + options)
+            subprocess.run(f"docker logs -f {self.config.odoo_name}".split() + options)
 
     def get_url(self, options):
         container = self.docker.containers.get(self.config.odoo_name)

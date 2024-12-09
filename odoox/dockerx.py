@@ -63,18 +63,14 @@ class Dockerx:
         if '-o' in options: options.remove('-o')
         if '-og' in options: options.remove('-og')
         if '-go' in options: options.remove('-go')
-        if command == 'start':
-            self.start_container(pg, odoo, options)
-            return
-        if command == 'restart':
-            self.restart_container(pg, odoo, options)
-            return
         if command == 'rm':
             options = ['-vf'] + options
         if pg:
             subprocess.run(['docker', command] + options + [self.config.pg_name])
+            subprocess.run(f"docker logs -f {self.config.pg_name}".split())
         if odoo:
             subprocess.run(['docker', command] + options + [self.config.odoo_name])
+            subprocess.run(f"docker logs -f {self.config.odoo_name}".split())
         if command == 'ps':
             self.list_containers(options)
         if command == 'im':
@@ -83,47 +79,6 @@ class Dockerx:
             self.list_images(options)
         if command == 'url':
             print(f"Go to {self.get_url(options)}")
-
-    def start_container(self, pg, odoo, options):
-        if pg:
-            pg_exists = self.docker.containers.list(all=True, filters={
-                'name': f"{self.config.project_name}_pg"
-            })
-            if pg_exists:
-                subprocess.run(['docker', 'start'] + [pg_exists[0].id] + options)
-            else:
-                pg_options = self.config['postgres']
-                pg_options['name'] = self.config.pg_name
-                pg = self.docker.containers.run(**pg_options)
-                print(f"{self.config.pg_name}: {pg.id}")
-
-        if odoo:
-            odoo_exists = self.docker.containers.list(all=True, filters={
-                'name': f"{self.config.project_name}_odoo"
-            })
-            if odoo_exists:
-                subprocess.run(['docker', 'start'] + [odoo_exists[0].id] + options)
-                subprocess.run(f"docker logs -f {self.config.odoo_name}".split())
-            else:
-                odoo_options = self.config['odoo']
-                odoo_options['image'] = f"{self.config.repo}:latest"
-                odoo_options['name'] = self.config.odoo_name
-                odoo_options['links'] = {
-                    self.config.pg_name: 'db'
-                }
-                port = self.config.odoo_version[:2]
-                # set port for current image (--dev mode)
-                odoo_options['ports']['8069/tcp'] = f"{port}69"
-                odoo_container = self.docker.containers.run(**odoo_options)
-                print(f"{self.config.odoo_name}: {odoo_container.id}")
-            
-    def restart_container(self, pg, odoo, options):
-        if pg:
-            subprocess.run(f"docker restart {self.config.pg_name}".split() + options)
-            subprocess.run(f"docker logs -f {self.config.pg_name}".split() + options)
-        if odoo:
-            subprocess.run(f"docker restart {self.config.odoo_name}".split() + options)
-            subprocess.run(f"docker logs -f {self.config.odoo_name}".split() + options)
 
     def get_url(self, options):
         container = self.docker.containers.get(self.config.odoo_name)

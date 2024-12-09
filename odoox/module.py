@@ -89,6 +89,7 @@ def install_module(module, options):
     """
     module_path = Path(f"./{module}")
     BASE_DEPS_DIR = Path("xaddons")
+    gitx.set_user_permission(str(BASE_DEPS_DIR), 0o777)
     DEST_DIR = Path("/mnt/extra-addons")
 
     config = configparser.ConfigParser()

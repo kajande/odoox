@@ -15,7 +15,10 @@ class PG:
         pg_connect = config['pg_connect']
         self.host = pg_connect['host']
         self.port = pg_connect['port']
-        self.dbname = odoo_conf['options']['db_name']
+        try:
+            self.dbname = odoo_conf['options']['db_name']
+        except KeyError:
+            self.dbname = False
         self.user = pg_connect['user']
         self.password = pg_connect['password']
 

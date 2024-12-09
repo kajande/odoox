@@ -1,7 +1,7 @@
 import subprocess
 from pathlib import Path
 
-def clone_and_checkout(repo_url, branch=None, commit_hash=None, target_dir="."):
+def clone_and_checkout(repo_url, branch=None, commit_hash=None, target_dir=None):
     """
     Clone a repository and optionally check out a specific branch and/or commit.
     
@@ -11,6 +11,8 @@ def clone_and_checkout(repo_url, branch=None, commit_hash=None, target_dir="."):
         commit_hash (str, optional): The commit hash to check out. Defaults to None (HEAD).
         target_dir (str): The directory where the repository will be cloned.
     """
+    if not target_dir:
+        target_dir="."
     try:
         # Build the clone command
         clone_command = ["git", "clone"]

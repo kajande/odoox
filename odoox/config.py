@@ -1,5 +1,6 @@
 from pathlib import Path
 import configparser
+import os
 
 class Config:
     def __init__(self):
@@ -160,6 +161,10 @@ class Config:
         for host_path, volume_details in volumes.items():
             bind = volume_details.get("bind")
             cmd.append(f'-v {host_path}:{bind}')
+        # mount ssh agent forwarding
+        os.environ["SSH_AUTH_SOCK"]
+        cmd.append(f' -v {os.environ["SSH_AUTH_SOCK"]}:/ssh-agent')
+        cmd.append(' -e SSH_AUTH_SOCK=/ssh-agent')
 
         links = odoo_options.get("links", {})
         for container_name, alias in links.items():
@@ -189,7 +194,6 @@ if __name__ == '__main__':
     port = 17
 
     odoo_options = config['odoo']
-
     command = config.generate_odoo_options(tag, port, config['odoo'])
     print(command)
     import ipdb;ipdb.set_trace()

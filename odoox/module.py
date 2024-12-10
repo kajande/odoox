@@ -60,10 +60,10 @@ def execute(command, options):
 
     if '--init' in options:
         options.remove('--init')
-        if not docker:
+        if docker:
             init_module(module, options)
         else:
-            subprocess.run(f"docker exec -it {odoo_name} odoox m {module} --init".split())
+            pass
 
     if options:
             subprocess.run(f"odoox {' '.join(options)}".split())
@@ -272,6 +272,8 @@ def upgrade_module(module, db, options):
 
 def init_module(name, options):
 
+    # gitx.set_user_permission(dir_name=name, permission=0o777)
+
     module_dir = Path(name)
     module_dir.mkdir(exist_ok=True)
 
@@ -281,7 +283,5 @@ def init_module(name, options):
     get_security(name)
     get_models_dir(name)
     get_views_dir(name)
-
-    gitx.set_user_permission(dir_name=name, permission=0o777)
 
     print(f"Module '{name}' created successfully.")

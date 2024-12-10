@@ -166,6 +166,12 @@ class Config:
         cmd.append(f' -v {os.environ["SSH_AUTH_SOCK"]}:/ssh-agent')
         cmd.append(' -e SSH_AUTH_SOCK=/ssh-agent')
 
+        # mount addons dir:
+        # addons dir was created during project initialization:
+        # odoox p project_name --init
+        addons_dir = self.project_path.resolve()/self.project_name/'addons'
+        cmd.append(f"-v {addons_dir}:/mnt/extra-addons")
+
         links = odoo_options.get("links", {})
         for container_name, alias in links.items():
             cmd.append(f'--link {container_name}:{alias}')

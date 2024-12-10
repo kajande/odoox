@@ -32,6 +32,12 @@ def init_project(project_name=None, options=None):
     project_name = project_dir.resolve().stem
     update_db_name(project_dir/'odoo.conf', project_name)
 
+    # initialize main module
+    subprocess.run(f"odoox m {project_name} --init".split(), cwd=project_dir)
+    # create addons dir
+    addons_dir = Path(f"{project_dir}/{project_dir}/addons")
+    addons_dir.mkdir(exist_ok=True)
+
     print(f"Project '{project_name}' created successfully.")
 
 def update_db_name(file_path, db_name):

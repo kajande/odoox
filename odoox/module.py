@@ -88,6 +88,7 @@ def install_module(module, options):
     and removes any extra modules not listed in the configuration file.
     """
     module_path = Path(f"./{module}")
+    import ipdb;ipdb.set_trace()
     BASE_DEPS_DIR = Path("xaddons")
     gitx.set_user_permission(str(BASE_DEPS_DIR), 0o777)
     DEST_DIR = Path("/mnt/extra-addons")

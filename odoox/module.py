@@ -20,10 +20,8 @@ def execute(command, options):
     module = command[0]
     if '-i' in options:
         options.remove('-i')
-        if not docker:
-            install_module(module, options)
-        else:
-            subprocess.run(f"docker exec -it {odoo_name} odoox m {module} -i".split())
+        install_module(module, options)
+
     if '--i' in options:
         options.remove('--i')
         if not docker:
@@ -87,27 +85,25 @@ def install_module(module, options):
     Copies specified modules from the source directory to the destination directory,
     and removes any extra modules not listed in the configuration file.
     """
-    module_path = Path(f"./{module}")
-    import ipdb;ipdb.set_trace()
-    BASE_DEPS_DIR = Path("xaddons")
-    gitx.set_user_permission(str(BASE_DEPS_DIR), 0o777)
-    DEST_DIR = Path("/mnt/extra-addons")
+    BASE_DEPS_DIR = Path(f"./{config.project_name}/repos")
+    DEST_DIR = Path(f"./{config.project_name}/addons")
 
-    config = configparser.ConfigParser()
-    config.read(f"{module}/gitx.conf")
+    depfile = configparser.ConfigParser()
+    depfile.read(f"{module}/gitx.conf")
 
-    dep_modules = set(config.sections())
+    dep_modules = set(depfile.sections())
 
     DEST_DIR.mkdir(parents=True, exist_ok=True)
 
     # Find and remove extra modules
-    existing_modules = {p.name for p in DEST_DIR.iterdir() if p.is_dir()}
-    for extra_module in existing_modules - dep_modules - {module}:
-        uninstall_dependency(extra_module, DEST_DIR)
+    # existing_modules = {p.name for p in DEST_DIR.iterdir() if p.is_dir()}
+    # for extra_module in existing_modules - dep_modules - {module}:
+    #     if extra_module not installed (i.e. activated): ADD THIS!
+    #         uninstall_dependency(extra_module, DEST_DIR)
 
-    # Copy modules listed in the config file
+    # Copy modules listed in the depfile file
     for dep_module in dep_modules:
-        pull_uri = config[dep_module].get('pulluri', '')
+        pull_uri = depfile[dep_module].get('pulluri', '')
         if not pull_uri:
             print(f"Warning: No pull URI defined for module '{dep_module}'")
             continue
@@ -121,8 +117,8 @@ def install_module(module, options):
             if not source_path.exists():
                 clone_args = {
                     "repo_url": pull_uri,
-                    "branch": config[dep_module].get('track', 'main'),
-                    "commit_hash": config[dep_module].get('track', ''),
+                    "branch": depfile[dep_module].get('track', 'main'),
+                    "commit_hash": depfile[dep_module].get('track', ''),
                     "target_dir": BASE_DEPS_DIR/org/repo,
                 }
                 gitx.clone_and_checkout(**clone_args)
@@ -131,8 +127,6 @@ def install_module(module, options):
             print(f"Installed '{dep_module}'")
         except Exception as e:
             print(f"Error processing module '{dep_module}': {e}")
-    # Finally install the parent module
-    shutil.copytree(module_path, DEST_DIR/module_path, dirs_exist_ok=True)
     print(f"Installed '{module}'")
     update_apps_list(odoo_conf['options']['db_name'])
 
@@ -145,10 +139,10 @@ def uninstall_module(module, options):
     module_path = Path(f"./{module}")
     BASE_DEPS_DIR = Path("xaddons")
 
-    config = configparser.ConfigParser()
-    config.read(f"{module}/gitx.conf")
+    depfile = configparser.ConfigParser()
+    depfile.read(f"{module}/gitx.conf")
 
-    dep_modules = set(config.sections())
+    dep_modules = set(depfile.sections())
 
     # Uninstall dependencies recursively
     for dep_module in dep_modules:
@@ -169,13 +163,13 @@ def update_apps_list(db_name):
     """
     Update the Odoo apps list.
 
-    :param host: Host where Odoo is running (e.g., "localhost").
+    :param host: Host where Odoo is running (e.g., config.odoo_ip).
     :param port: Port where Odoo is running (e.g., 8069).
     :param database: Name of the database to connect to.
     :param username: Username for Odoo authentication.
     :param password: Password for Odoo authentication.
     """
-    host = "localhost"
+    host = config.odoo_ip
     port = 8069
     database = db_name
     username = "admin"
@@ -190,7 +184,7 @@ def update_apps_list(db_name):
         print(f"Error occurred: {e}")
 
 def activate_module(module, db, options):
-    host = "localhost"
+    host = config.odoo_ip
     port = 8069
     admin_user = "admin"
     admin_password = "admin"
@@ -218,7 +212,7 @@ def activate_module(module, db, options):
         print(f"Unexpected error: {e}")
 
 def deactivate_module(module, db, options):
-    host = "localhost"
+    host = config.odoo_ip
     port = 8069
     admin_user = "admin"
     admin_password = "admin"
@@ -246,7 +240,7 @@ def deactivate_module(module, db, options):
         print(f"Unexpected error: {e}")
 
 def upgrade_module(module, db, options):
-    host = "localhost"
+    host = config.odoo_ip
     port = 8069
     user = "admin"
     password = "admin"

@@ -1,6 +1,7 @@
 from pathlib import Path
 import configparser
 import os
+import subprocess
 
 class Config:
     def __init__(self):
@@ -127,6 +128,20 @@ class Config:
     @property
     def current_db(self):
         return self.odoo_conf['options']['db_name']
+    
+    @property
+    def odoo_ip(self):
+        try:
+            result = subprocess.run(
+                ["docker", "inspect", "-f", "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}", self.odoo_name],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+                check=True
+            )
+            return result.stdout.strip()
+        except subprocess.CalledProcessError as e:
+            return f"Error: {e.stderr.strip()}"
     
     def generate_postgres_options(self, options):
         pg_options = self.config['postgres']

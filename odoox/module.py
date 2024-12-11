@@ -24,37 +24,25 @@ def execute(command, options):
 
     if '--i' in options:
         options.remove('--i')
-        if not docker:
-            uninstall_module(module, options) 
-        else:
-            subprocess.run(f"docker exec -it {odoo_name} odoox m {module} --i".split())
+        uninstall_module(module, options)
+
     if '-l' in options:
         options.remove('-l')
-        if not docker:
-            list(options)
-        else:
-            subprocess.run(f"docker exec -it {odoo_name} odoox m {module} -l".split())
+        list(options)
+
     
     if '-a' in options:
         options.remove('-a')
-        if not docker:
-            activate_module(module, db_name, options)
-        else:
-            subprocess.run(f"docker exec -it {odoo_name} odoox m {module} -a".split())
+        import ipdb;ipdb.set_trace()
+        activate_module(module, db_name, options)
 
     if '--a' in options:
         options.remove('--a')
-        if not docker:
-            deactivate_module(module, db_name, options)
-        else:
-            subprocess.run(f"docker exec -it {odoo_name} odoox m {module} --a".split())
+        deactivate_module(module, db_name, options)
 
     if '-u' in options:
         options.remove('-u')
-        if not docker:
-            upgrade_module(module, db_name, options)
-        else:
-            subprocess.run(f"docker exec -it {odoo_name} odoox m {module} -u".split())
+        upgrade_module(module, db_name, options)
 
     if '--init' in options:
         options.remove('--init')

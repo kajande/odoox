@@ -24,7 +24,10 @@ def execute(command, options):
 
     if '--i' in options:
         options.remove('--i')
-        uninstall_module(module, options)
+        if not docker:
+            uninstall_module(module, options)
+        else:
+            subprocess.run(f"docker exec -it {odoo_name} odoox m {module} --i".split())
 
     if '-l' in options:
         options.remove('-l')
@@ -33,7 +36,6 @@ def execute(command, options):
     
     if '-a' in options:
         options.remove('-a')
-        import ipdb;ipdb.set_trace()
         activate_module(module, db_name, options)
 
     if '--a' in options:
@@ -62,7 +64,8 @@ def uninstall_dependency(dep_module, dest_dir):
     if module_path.exists() and module_path.is_dir():
         try:
             shutil.rmtree(module_path)
-            pg.uninstall(dep_module)
+            rpc_uninstall(dep_module)
+            # pg.uninstall(dep_module)
             print(f"Uninstalled '{dep_module}'")
         except Exception as e:
             print(f"Error removing extra module '{dep_module}': {e}")
@@ -140,11 +143,89 @@ def uninstall_module(module, options):
     uninstall_dependency(module, DEST_DIR)
 
     # Remove from postgres db
-    pg.uninstall(module)
+    rpc_uninstall(module)
+    # pg.uninstall(module)
 
 def list(options):
     subprocess.run("ls /mnt/extra-addons".split())
 
+
+def rpc_uninstall(module_name):
+    """
+    Completely removes a module and all its related data from the Odoo database.
+
+    :param odoo: An instance of odoorpc.ODOO connected to the target database.
+    :param module_name: The technical name of the module to remove.
+    :return: True if the module was successfully removed, False otherwise.
+    """
+    host = config.odoo_ip
+    port = 8069
+    database = config.current_db
+    username = "admin"
+    password = "admin"
+    try:
+        odoo = odoorpc.ODOO(host, port=port)
+        odoo.login(database, username, password)
+        # Access necessary models
+        Module = odoo.env['ir.module.module']
+        View = odoo.env['ir.ui.view']
+        Menu = odoo.env['ir.ui.menu']
+        Action = odoo.env['ir.actions.actions']
+        Model = odoo.env['ir.model']
+        ModelData = odoo.env['ir.model.data']
+
+        # Find the module record
+        module_ids = Module.search([('name', '=', module_name)])
+        if not module_ids:
+            print(f"Module '{module_name}' not found.")
+            return False
+        
+        module_id = module_ids[0]
+
+        # Step 1: Uninstall the module
+        Module.button_immediate_uninstall([module_id])
+        print(f"Module '{module_name}' has been uninstalled.")
+
+        # Step 2: Clean up views associated with the module
+        views = View.search([('module', '=', module_name)])
+        if views:
+            View.unlink(views)
+            print(f"Removed {len(views)} associated views.")
+
+        # Step 3: Clean up menus associated with the module
+        menus = Menu.search([('module', '=', module_name)])
+        if menus:
+            Menu.unlink(menus)
+            print(f"Removed {len(menus)} associated menus.")
+
+        # Step 4: Clean up actions associated with the module
+        actions = Action.search([('module', '=', module_name)])
+        if actions:
+            Action.unlink(actions)
+            print(f"Removed {len(actions)} associated actions.")
+
+        # Step 5: Clean up models introduced by the module
+        models = Model.search([('module', '=', module_name)])
+        if models:
+            Model.unlink(models)
+            print(f"Removed {len(models)} associated models.")
+
+        # Step 6: Remove entries in ir.model.data for this module
+        data_entries = ModelData.search([('module', '=', module_name)])
+        if data_entries:
+            ModelData.unlink(data_entries)
+            print(f"Removed {len(data_entries)} entries from ir.model.data.")
+
+        # Step 7: Delete the module record itself
+        Module.unlink([module_id])
+        print(f"Module record for '{module_name}' has been deleted.")
+
+        print(f"Module '{module_name}' and all its traces have been removed.")
+        return True
+
+    except Exception as e:
+        print(f"An error occurred while removing the module '{module_name}': {e}")
+        return False
 
 
 def update_apps_list(db_name):
@@ -183,7 +264,7 @@ def activate_module(module, db, options):
         module_ids = module_model.search([('name', '=', module)])
         
         if not module_ids:
-            subprocess.run(f"odoox m -i {module}".split())
+            subprocess.run(f"odoox m {module} -i".split())
             module_ids = module_model.search([('name', '=', module)])
         
         module_record = module_model.browse(module_ids[0])

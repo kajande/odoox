@@ -67,7 +67,6 @@ class Dockerx:
             options = ['-vf'] + options
         if pg:
             subprocess.run(['docker', command] + options + [self.config.pg_name])
-            subprocess.run(f"docker logs -f {self.config.pg_name}".split())
         if odoo:
             subprocess.run(['docker', command] + options + [self.config.odoo_name])
             subprocess.run(f"docker logs -f {self.config.odoo_name}".split())

@@ -8,7 +8,6 @@ import odoorpc
 
 from .config import config
 from .odoo_conf import odoo_conf
-from .pgx import pg
 from . import gitx
 
 from .module_init import *
@@ -65,10 +64,10 @@ def uninstall_dependency(dep_module, dest_dir):
         try:
             shutil.rmtree(module_path)
             rpc_uninstall(dep_module)
-            # pg.uninstall(dep_module)
             print(f"Uninstalled '{dep_module}'")
         except Exception as e:
             print(f"Error removing extra module '{dep_module}': {e}")
+
 
 
 def install_module(module, options):
@@ -125,10 +124,8 @@ def uninstall_module(module, options):
     """
     Uninstalls the specified module and its dependencies.
     """
-    DEST_DIR = Path("/mnt/extra-addons")
-
-    module_path = Path(f"./{module}")
-    BASE_DEPS_DIR = Path("xaddons")
+    # we are inside the container
+    DEST_DIR = Path(f"./{config.project_name}/addons")
 
     depfile = configparser.ConfigParser()
     depfile.read(f"{module}/gitx.conf")
@@ -138,23 +135,27 @@ def uninstall_module(module, options):
     # Uninstall dependencies recursively
     for dep_module in dep_modules:
         uninstall_dependency(dep_module, DEST_DIR)
+    import ipdb;ipdb.set_trace()
+    backup_module(module, options)
+    uninstall_dependency(module, Path('.'))
 
-    # Now uninstall the main module
-    uninstall_dependency(module, DEST_DIR)
-
-    # Remove from postgres db
-    rpc_uninstall(module)
-    # pg.uninstall(module)
+    print(f"Unnstalled '{module}'")
 
 def list(options):
     subprocess.run("ls /mnt/extra-addons".split())
+
+def backup_module(module, options):
+    backup_dir = Path(f"./{config.project_name}/backup")
+    backup_dir.mkdir(exist_ok=True)
+    src_path = Path(f"./{module}")
+    dest_path = backup_dir/module
+    shutil.copytree(src_path, dest_path, dirs_exist_ok=True)
 
 
 def rpc_uninstall(module_name):
     """
     Completely removes a module and all its related data from the Odoo database.
 
-    :param odoo: An instance of odoorpc.ODOO connected to the target database.
     :param module_name: The technical name of the module to remove.
     :return: True if the module was successfully removed, False otherwise.
     """
@@ -163,15 +164,13 @@ def rpc_uninstall(module_name):
     database = config.current_db
     username = "admin"
     password = "admin"
+
     try:
         odoo = odoorpc.ODOO(host, port=port)
         odoo.login(database, username, password)
+
         # Access necessary models
         Module = odoo.env['ir.module.module']
-        View = odoo.env['ir.ui.view']
-        Menu = odoo.env['ir.ui.menu']
-        Action = odoo.env['ir.actions.actions']
-        Model = odoo.env['ir.model']
         ModelData = odoo.env['ir.model.data']
 
         # Find the module record
@@ -179,48 +178,18 @@ def rpc_uninstall(module_name):
         if not module_ids:
             print(f"Module '{module_name}' not found.")
             return False
-        
+
         module_id = module_ids[0]
 
-        # Step 1: Uninstall the module
-        Module.button_immediate_uninstall([module_id])
-        print(f"Module '{module_name}' has been uninstalled.")
-
-        # Step 2: Clean up views associated with the module
-        views = View.search([('module', '=', module_name)])
-        if views:
-            View.unlink(views)
-            print(f"Removed {len(views)} associated views.")
-
-        # Step 3: Clean up menus associated with the module
-        menus = Menu.search([('module', '=', module_name)])
-        if menus:
-            Menu.unlink(menus)
-            print(f"Removed {len(menus)} associated menus.")
-
-        # Step 4: Clean up actions associated with the module
-        actions = Action.search([('module', '=', module_name)])
-        if actions:
-            Action.unlink(actions)
-            print(f"Removed {len(actions)} associated actions.")
-
-        # Step 5: Clean up models introduced by the module
-        models = Model.search([('module', '=', module_name)])
-        if models:
-            Model.unlink(models)
-            print(f"Removed {len(models)} associated models.")
-
-        # Step 6: Remove entries in ir.model.data for this module
+        # Remove all entries in ir.model.data for this module
         data_entries = ModelData.search([('module', '=', module_name)])
         if data_entries:
             ModelData.unlink(data_entries)
             print(f"Removed {len(data_entries)} entries from ir.model.data.")
 
-        # Step 7: Delete the module record itself
+        # Remove the module record itself
         Module.unlink([module_id])
-        print(f"Module record for '{module_name}' has been deleted.")
 
-        print(f"Module '{module_name}' and all its traces have been removed.")
         return True
 
     except Exception as e:

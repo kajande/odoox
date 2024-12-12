@@ -75,6 +75,14 @@ def install_module(module, options):
     Copies specified modules from the source directory to the destination directory,
     and removes any extra modules not listed in the configuration file.
     """
+    module_path = Path(f"./{module}")
+    if not module_path.exists():
+        try:
+            restore_module(module, options)
+        except Exception as e:
+            print(e)
+            raise Exception(f"Please initialize {module} before attempting install.")
+
     BASE_DEPS_DIR = Path(f"./{config.project_name}/repos")
     DEST_DIR = Path(f"./{config.project_name}/addons")
 
@@ -135,7 +143,6 @@ def uninstall_module(module, options):
     # Uninstall dependencies recursively
     for dep_module in dep_modules:
         uninstall_dependency(dep_module, DEST_DIR)
-    import ipdb;ipdb.set_trace()
     backup_module(module, options)
     uninstall_dependency(module, Path('.'))
 
@@ -149,6 +156,14 @@ def backup_module(module, options):
     backup_dir.mkdir(exist_ok=True)
     src_path = Path(f"./{module}")
     dest_path = backup_dir/module
+    shutil.copytree(src_path, dest_path, dirs_exist_ok=True)
+
+def restore_module(module, options):
+    backup_dir = Path(f"./{config.project_name}/backup")
+    src_path = backup_dir/module
+    if not src_path.exists():
+        raise Exception(f"Module {module} not found in backup.")
+    dest_path = Path(f"./{module}")
     shutil.copytree(src_path, dest_path, dirs_exist_ok=True)
 
 

@@ -36,7 +36,7 @@ def init_project(project_name=None, options=None):
     # initialize main module
     subprocess.run(f"odoox m {project_name} --init".split(), cwd=project_dir)
     # create addons dir
-    addons_dir = Path(f"{project_dir}/{project_dir}/addons")
+    addons_dir = Path((f"{project_dir}/{project_name}"))/"addons"
     addons_dir.mkdir(exist_ok=True)
     
     print(f"Project '{project_name}' created successfully.")

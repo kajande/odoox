@@ -1,7 +1,8 @@
 from pathlib import Path
 import configparser
 import os
-import subprocess
+import socket
+import docker
 
 class Config:
     def __init__(self):
@@ -131,18 +132,26 @@ class Config:
     
     @property
     def odoo_ip(self):
-        try:
-            result = subprocess.run(
-                ["docker", "inspect", "-f", "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}", self.odoo_name],
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                text=True,
-                check=True
-            )
-            return result.stdout.strip()
-        except subprocess.CalledProcessError as e:
-            return f"Error: {e.stderr.strip()}"
-    
+        if self.get_docker_client():
+            try:
+                client = docker.from_env()  # Initialize the Docker client
+                container = client.containers.get(self.odoo_name)  # Get the container by name
+                network_settings = container.attrs['NetworkSettings']['Networks']  # Access network settings
+                # Retrieve the IP address from the first network
+                ip_address = next(iter(network_settings.values()))['IPAddress']
+                return ip_address
+            except docker.errors.NotFound:
+                return f"Error: Container '{self.odoo_name}' not found."
+            except Exception as e:
+                return f"Error: {str(e)}"
+        else:
+            try:
+                hostname = socket.gethostname()
+                return socket.gethostbyname(hostname)
+            except socket.error as e:
+                return f"Error: {e}"
+
+
     def generate_postgres_options(self, options):
         pg_options = self.config['postgres']
         cmd = []

@@ -27,6 +27,7 @@ def execute(command, options):
             uninstall_module(module, options)
         else:
             subprocess.run(f"docker exec -it {odoo_name} odoox m {module} --i".split())
+            subprocess.run("odoox restart -o".split())
 
     if '-l' in options:
         options.remove('-l')

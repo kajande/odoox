@@ -115,7 +115,7 @@ def install_module(module, options):
             if not source_path.exists():
                 clone_args = {
                     "repo_url": pull_uri,
-                    "branch": depfile[dep_module].get('track', 'main'),
+                    "branch": depfile[dep_module].get('branch'),
                     "commit_hash": depfile[dep_module].get('track', ''),
                     "target_dir": BASE_DEPS_DIR/org/repo,
                 }

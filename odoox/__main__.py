@@ -38,7 +38,7 @@ def main():
             if '-og' in args.options or '-go' in args.options:
                 pg, odoo = True, True
             dockerx.execute(args.command[0], args.options, pg=pg, odoo=odoo)
-    if args.command[0] in ('m', 'p', 'db'):
+    if args.command[0] in ('m', 'p', 'db', 'k'):
         odoox.execute(args.command, args.options)
 
 

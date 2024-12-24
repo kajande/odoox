@@ -142,6 +142,31 @@ Before you begin, ensure that you have the following installed:
 
 ## Additional Commands
 
+- **Manage containers:**
+  
+  ```bash
+  odoox ps
+  ```
+   Prints the two containers (_odoo_ and _postgres_) within this project.
+   The two containers are named `{project_name}_odoo` and `{project_name}_pg` respectively.
+
+   This means that you cannot recreate new containers because you'll get name conflicts. To do that you'll have to remove the existing ones with `odoox rm -og`.
+
+  ```bash
+  odoox restart -o
+  odoox restart -g
+  odoox restart -og
+  odoox start -o|-g|-og
+  odoox stop -o|-g|-og
+  odoox rm -o|-g|-og
+
+  odoox in -o # gets you inside the odoo container
+  odoox in -g # gets you inside the postgres container
+  ```
+  - *-o* targets the _odoo container_
+  - *-g* targets the _postgres container_
+  - *-og* or *-go* targets both the _odoo container_ and the _postgres container_
+
 - **Get the access URL:**
   ```bash
   odoox url
@@ -153,6 +178,11 @@ Before you begin, ensure that you have the following installed:
   odoox im
   ```
   Displays all images built for the project.
+
+   ```bash
+  odoox im --rm
+  ```
+  Removes current image (tagged `latest`).
 
 - **Tag an image:**
   ```bash
@@ -289,6 +319,9 @@ odoox db <dbname> --options
    ```
    Lists all databases created under the current project. **(TODO)**
 
+   Do you want additional database operations ?
+   Run the command `odoox in -g` to get straight away inside the database and start `list`ing or `delet`ing databases.
+
 ### Notes:
 
 - **Database Name Prefix:**
@@ -363,13 +396,13 @@ The tool provides various commands to interact with Odoo modules, configurations
 - **Initialize a module:**
 
   ```bash
-  odoox init_module --module_name new_module
+  odoox m <module_name> --init
   ```
 
 - **Manage Docker containers:**
 
   ```bash
-  odoox dockerx --restart
+  odoox restart -o
   ```
 
 More detailed command options will be documented in the respective modules.

@@ -11,19 +11,6 @@ Odoox is a command-line tool designed to streamline Odoo development workflows. 
 - [Documentation for the Odoox Project](#documentation-for-the-odoox-project)
   - [Overview](#overview)
   - [Table of Contents](#table-of-contents)
-  - [Project Structure](#project-structure)
-    - [Key Files](#key-files)
-  - [Installation](#installation)
-  - [Usage](#usage)
-  - [Modules Overview](#modules-overview)
-    - [`config.py`](#configpy)
-    - [`db.py`](#dbpy)
-    - [`dockerx.py`](#dockerxpy)
-    - [`gitx.py`](#gitxpy)
-    - [`module.py`](#modulepy)
-    - [`module_init.py`](#module_initpy)
-    - [`odoo_conf.py`](#odoo_confpy)
-    - [`project.py`](#projectpy)
 - [Tutorial: Getting Started with Odoox](#tutorial-getting-started-with-odoox)
   - [Prerequisites](#prerequisites)
   - [Step 1: Initialize a New Odoo Project](#step-1-initialize-a-new-odoo-project)
@@ -40,148 +27,21 @@ Odoox is a command-line tool designed to streamline Odoo development workflows. 
     - [Overview](#overview-2)
     - [Available Options](#available-options-1)
     - [Notes:](#notes-1)
+- [Contribute.](#contribute)
+  - [Project Structure](#project-structure)
+    - [Key Files](#key-files)
+  - [Installation](#installation)
+  - [Usage](#usage)
+  - [Modules Overview](#modules-overview)
+    - [`config.py`](#configpy)
+    - [`db.py`](#dbpy)
+    - [`dockerx.py`](#dockerxpy)
+    - [`gitx.py`](#gitxpy)
+    - [`module.py`](#modulepy)
+    - [`module_init.py`](#module_initpy)
+    - [`odoo_conf.py`](#odoo_confpy)
+    - [`project.py`](#projectpy)
   - [Future Enhancements](#future-enhancements)
-
----
-
-## Project Structure
-
-```
-odoox/
-├── odoox/
-│   ├── __init__.py
-│   ├── __main__.py
-│   ├── config.py
-│   ├── db.py
-│   ├── dockerx.py
-│   ├── gitx.py
-│   ├── module.py
-│   ├── module_init.py
-│   ├── odoo_conf.py
-│   ├── project.py
-├── .gitignore
-├── LICENSE
-├── README.md
-├── requirements.txt
-├── setup.py
-```
-
-### Key Files
-
-- **`odoox/`**: Contains the main logic of the project.
-- **`setup.py`**: Installation script for packaging and distribution.
-- **`requirements.txt`**: Python dependencies required for the project.
-- **`README.md`**: High-level description and instructions for the tool.
-
----
-
-## Installation
-
-1. Clone the repository:
-
-   ```bash
-   git clone <repository_url>
-   cd odoox
-   ```
-
-2. Install the project and dependencies:
-
-   ```bash
-   pip install -e .
-   ```
-
-3. Verify installation:
-
-   ```bash
-   odoox --help
-   ```
-
----
-
-## Usage
-
-The tool provides various commands to interact with Odoo modules, configurations, and workflows. Below are some example usages:
-
-- **Initialize a module:**
-
-  ```bash
-  odoox init_module --module_name new_module
-  ```
-
-- **Manage Docker containers:**
-
-  ```bash
-  odoox dockerx --restart
-  ```
-
-More detailed command options will be documented in the respective modules.
-
----
-
-## Modules Overview
-
-### `config.py`
-
-**Purpose:** Handles configuration settings for the project.
-
-- **Key Features:**
-  - Load Odoo configurations from files.
-  - Provide methods for accessing database and Docker settings.
-
-### `db.py`
-
-**Purpose:** Provides database utilities for interacting with Odoo databases.
-
-- **Key Features:**
-  - Connect to the PostgreSQL database.
-  - Execute queries securely.
-
-### `dockerx.py`
-
-**Purpose:** Manages Docker containers running Odoo instances.
-
-- **Key Features:**
-  - Restart Docker containers.
-  - Fetch container details (e.g., IP address).
-
-### `gitx.py`
-
-**Purpose:** Facilitates Git operations for Odoo projects.
-
-- **Key Features:**
-  - Clone repositories.
-  - Manage Git workflows.
-
-### `module.py`
-
-**Purpose:** Contains logic for managing Odoo modules.
-
-- **Key Features:**
-  - Copy and rename Odoo modules.
-  - Update module configurations.
-
-### `module_init.py`
-
-**Purpose:** Handles initialization of Odoo modules within the development environment.
-
-- **Key Features:**
-  - Automates the creation of Odoo module scaffolding.
-
-### `odoo_conf.py`
-
-**Purpose:** Manages the `odoo.conf` configuration file.
-
-- **Key Features:**
-  - Read and write Odoo configuration files.
-  - Update database and path settings.
-
-### `project.py`
-
-**Purpose:** Manages high-level project settings and operations.
-
-- **Key Features:**
-  - Set up new Odoo projects.
-  - Organize project files and directories.
 
 ---
 
@@ -437,6 +297,149 @@ odoox db <dbname> --options
   odoox db test -c
   ```
   under a project named `proj` will create a database named `proj_test`.
+
+---
+
+# Contribute.
+
+## Project Structure
+
+```
+odoox/
+├── odoox/
+│   ├── __init__.py
+│   ├── __main__.py
+│   ├── config.py
+│   ├── db.py
+│   ├── dockerx.py
+│   ├── gitx.py
+│   ├── module.py
+│   ├── module_init.py
+│   ├── odoo_conf.py
+│   ├── project.py
+├── .gitignore
+├── LICENSE
+├── README.md
+├── requirements.txt
+├── setup.py
+```
+
+### Key Files
+
+- **`odoox/`**: Contains the main logic of the project.
+- **`setup.py`**: Installation script for packaging and distribution.
+- **`requirements.txt`**: Python dependencies required for the project.
+- **`README.md`**: High-level description and instructions for the tool.
+
+---
+
+## Installation
+
+1. Clone the repository:
+
+   ```bash
+   git clone <repository_url>
+   cd odoox
+   ```
+
+2. Install the project and dependencies:
+
+   ```bash
+   pip install -e .
+   ```
+
+3. Verify installation:
+
+   ```bash
+   odoox --help
+   ```
+
+---
+
+## Usage
+
+The tool provides various commands to interact with Odoo modules, configurations, and workflows. Below are some example usages:
+
+- **Initialize a module:**
+
+  ```bash
+  odoox init_module --module_name new_module
+  ```
+
+- **Manage Docker containers:**
+
+  ```bash
+  odoox dockerx --restart
+  ```
+
+More detailed command options will be documented in the respective modules.
+
+---
+
+## Modules Overview
+
+### `config.py`
+
+**Purpose:** Handles configuration settings for the project.
+
+- **Key Features:**
+  - Load Odoo configurations from files.
+  - Provide methods for accessing database and Docker settings.
+
+### `db.py`
+
+**Purpose:** Provides database utilities for interacting with Odoo databases.
+
+- **Key Features:**
+  - Connect to the PostgreSQL database.
+  - Execute queries securely.
+
+### `dockerx.py`
+
+**Purpose:** Manages Docker containers running Odoo instances.
+
+- **Key Features:**
+  - Restart Docker containers.
+  - Fetch container details (e.g., IP address).
+
+### `gitx.py`
+
+**Purpose:** Facilitates Git operations for Odoo projects.
+
+- **Key Features:**
+  - Clone repositories.
+  - Manage Git workflows.
+
+### `module.py`
+
+**Purpose:** Contains logic for managing Odoo modules.
+
+- **Key Features:**
+  - Copy and rename Odoo modules.
+  - Update module configurations.
+
+### `module_init.py`
+
+**Purpose:** Handles initialization of Odoo modules within the development environment.
+
+- **Key Features:**
+  - Automates the creation of Odoo module scaffolding.
+
+### `odoo_conf.py`
+
+**Purpose:** Manages the `odoo.conf` configuration file.
+
+- **Key Features:**
+  - Read and write Odoo configuration files.
+  - Update database and path settings.
+
+### `project.py`
+
+**Purpose:** Manages high-level project settings and operations.
+
+- **Key Features:**
+  - Set up new Odoo projects.
+  - Organize project files and directories.
 
 ---
 

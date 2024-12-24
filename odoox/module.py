@@ -27,7 +27,6 @@ def execute(command, options):
             uninstall_module(module, options)
         else:
             subprocess.run(f"docker exec -it {odoo_name} odoox m {module} --i".split())
-            subprocess.run("odoox restart -o".split())
 
     if '-l' in options:
         options.remove('-l')
@@ -63,7 +62,8 @@ def uninstall_dependency(dep_module, dest_dir):
     module_path = dest_dir / dep_module
     if module_path.exists() and module_path.is_dir():
         try:
-            shutil.rmtree(module_path)
+            if module_path.name != config.project_name:
+                shutil.rmtree(module_path)
             rpc_uninstall(dep_module)
             print(f"Uninstalled '{dep_module}'")
         except Exception as e:
@@ -153,6 +153,8 @@ def list(options):
     subprocess.run("ls /mnt/extra-addons".split())
 
 def backup_module(module, options):
+    if module == config.project_name:
+        return
     backup_dir = Path(f"./{config.project_name}/backup")
     backup_dir.mkdir(exist_ok=True)
     src_path = Path(f"./{module}")

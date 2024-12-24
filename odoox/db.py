@@ -1,3 +1,5 @@
+import psycopg2
+from psycopg2 import sql
 import xmlrpc.client
 import odoorpc
 import subprocess
@@ -33,10 +35,10 @@ def execute(command, options):
             subprocess.run(f"docker exec -it {odoo_name} odoox db {db_name} -d".split())
     elif '-l' in options:
         options.remove('-l')
-        if not docker:
-            list_db(db_name)
-        else:
-            subprocess.run(f"docker exec -it {odoo_name} odoox db {db_name} -l".split())
+        # if not docker:
+        list_db(db_name)
+        # else:
+        #     subprocess.run(f"docker exec -it {odoo_name} odoox db {db_name} -l".split())
 
     elif '--debug' in options:
         options.remove('--debug')
@@ -50,6 +52,7 @@ def execute(command, options):
         subprocess.run(["odoox"] + command[1:] + options)
 
 def create_db(db_name, options):
+    db_name = config.project_name + "_" + db_name
     host = "localhost"
     port = 8069
     super_admin_password = "master"
@@ -73,6 +76,7 @@ def create_db(db_name, options):
 
 
 def delete_db(db_name, options):
+    db_name = config.project_name + "_" + db_name
     host = "localhost"
     port = 8069
     super_admin_password = "master"
@@ -87,6 +91,7 @@ def delete_db(db_name, options):
         print(f"Error occurred: {e.faultString}")
 
 def select_db(db_name, options):
+    db_name = config.project_name + "_" + db_name
     odoo_conf = configparser.ConfigParser()
     if config.get_docker_client():
         config_file = "./odoo.conf"
@@ -104,35 +109,51 @@ def select_db(db_name, options):
         print(e)
 
 
-def list_db(owner):
+def list_db(db_name):
     """
     List databases with the specified owner.
-    :param owner: The owner is the current project name.
+    :param db_name: The name of the database to list.
     """
+
     host = "localhost"
-    port = 8069
-    admin_password = "master"
-    url = f"http://{host}:{port}/xmlrpc/2/db"
-    db_proxy = xmlrpc.client.ServerProxy(url)
+    port = 5432
+    user = "odoo"
+    password = "odoo"
+    owner = config.project_name
 
     try:
-        # Fetch all databases
-        databases = db_proxy.list(admin_password)
+        # Connect to the PostgreSQL server
+        conn = psycopg2.connect(
+            dbname='postgres',
+            user=user,
+            password=password,
+            host=host,
+            port=port
+        )
+        conn.autocommit = True
+        cursor = conn.cursor()
 
-        # Placeholder for filtering (replace with actual filtering logic if available)
-        filtered_dbs = [
-            db for db in databases
-            if db.startswith(owner)  # Assuming owner-based filtering logic
-        ]
+        # Query to list databases owned by the specified owner
+        query = sql.SQL("SELECT datname FROM pg_database WHERE datdba = (SELECT usesysid FROM pg_user WHERE usename = %s)")
+        cursor.execute(query, (owner,))
+        db_list = cursor.fetchall()
 
-        import ipdb;ipdb.set_trace()
+        print("Databases:")
+        for db in db_list:
+            db = db[0]
+            if db == config.current_db:
+                print(f"* {db}")
+            else:
+                print(db)
 
-        for db in filtered_dbs:
-            print(db)
-        # return filtered_dbs
-    except xmlrpc.client.Fault as e:
-        print(f"Error occurred: {e.faultString}")
+        cursor.close()
+        conn.close()
+        return [db[0] for db in db_list]
+
+    except psycopg2.Error as e:
+        print(f"Error: {e}")
         return []
+
 
 def debug_db(db, options):
     host = "localhost"

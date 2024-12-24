@@ -31,6 +31,16 @@ Odoox is a command-line tool designed to streamline Odoo development workflows. 
   - [Step 3: Run the Project](#step-3-run-the-project)
   - [Additional Commands](#additional-commands)
   - [Conclusion](#conclusion)
+  - [Module Development](#module-development)
+    - [Overview](#overview-1)
+    - [Available Options](#available-options)
+    - [Notes:](#notes)
+    - [Terminology:](#terminology)
+  - [Database Management](#database-management)
+    - [Overview](#overview-2)
+    - [Available Options](#available-options-1)
+    - [Notes:](#notes-1)
+  - [Future Enhancements](#future-enhancements)
 
 ---
 
@@ -304,3 +314,138 @@ With just a few commands, **odoox** streamlines the process of setting up, build
 
 For additional details, check out the [documentation](https://github.com/kajande/odoox) or contribute to the project by submitting issues and pull requests.
 
+
+## Module Development
+
+### Overview
+
+Odoox simplifies module development with the base command:
+
+```bash
+odoox m <module> --option
+```
+
+- **`m`**: Denotes the subcommand for module-related operations.
+- **`<module>`**: The name of the target module.
+- **`--option`**: Specifies the operation to perform.
+
+### Available Options
+
+1. **Create a Module (Scaffold Base Code):**
+   ```bash
+   odoox m my_module --init
+   ```
+   Initializes the structure for a new module named `my_module`.
+
+2. **Install a Module:**
+   ```bash
+   odoox m my_module -i
+   ```
+   Installs the specified module in the active Odoo database.
+
+3. **Uninstall a Module:**
+   ```bash
+   odoox m my_module --i
+   ```
+   Uninstalls the module from the active Odoo database.
+
+4. **Activate a Module:**
+   ```bash
+   odoox m my_module -a
+   ```
+   Activates the module by installing its data and making it ready for use.
+
+5. **Deactivate a Module:**
+   ```bash
+   odoox m my_module --a
+   ```
+   Deactivates the module, effectively disabling it.
+
+6. **Update a Module:**
+   ```bash
+   odoox m my_module -u
+   ```
+   Updates the module's data by reloading XML or other configurations.
+
+### Notes:
+
+- **Restart After Code Changes:**
+  If you modify `.py` files, restart the server with:
+  ```bash
+  odoox restart -o
+  ```
+
+- **Update After XML Changes:**
+  If you modify `.xml` files, update the module with:
+  ```bash
+  odoox m my_module -u
+  ```
+
+### Terminology:
+
+- **Install vs. Activate:**
+  - `Install`: Makes the module available in the database and ready for activation.
+  - `Activate`: Performs the traditional "installation" by loading the module's data and making it usable.
+
+---
+
+## Database Management
+
+### Overview
+
+Odoox provides a set of commands to simplify interaction with PostgreSQL databases. The base command is:
+
+```bash
+odoox db <dbname> --options
+```
+
+- **`db`**: Denotes the subcommand for database-related operations.
+- **`<dbname>`**: The name of the database to interact with.
+- **`--options`**: Specifies the operation to perform.
+
+### Available Options
+
+1. **Create a Database:**
+   ```bash
+   odoox db <db_name> -c
+   ```
+   Creates a new database named `<project_name>_<db_name>`.
+
+2. **Select a Database:**
+   ```bash
+   odoox db <db_name> -s
+   ```
+   Selects an existing database for further operations. This sets the current database for module commands.
+
+3. **Delete a Database:**
+   ```bash
+   odoox db <db_name> -d
+   ```
+   Deletes a specific database, useful in cases of severe database inconsistencies.
+
+4. **List All Databases:**
+   ```bash
+   odoox db <db_name> -l
+   ```
+   Lists all databases created under the current project. **(TODO)**
+
+### Notes:
+
+- **Database Name Prefix:**
+  Running any `odoox db` command appends the current project name as a prefix to the database name. For example, executing:
+  ```bash
+  odoox db test -c
+  ```
+  under a project named `proj` will create a database named `proj_test`.
+
+---
+
+## Future Enhancements
+
+- Add more Docker container management features.
+- Integrate module testing capabilities.
+- Support for multi-environment configurations.
+
+---
+
+**Documentation Last Updated:** 2024-12-15

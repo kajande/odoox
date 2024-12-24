@@ -12,12 +12,13 @@ Odoox is a command-line tool designed to streamline Odoo development workflows. 
   - [Overview](#overview)
   - [Table of Contents](#table-of-contents)
 - [Tutorial: Getting Started with Odoox](#tutorial-getting-started-with-odoox)
-  - [Prerequisites](#prerequisites)
-  - [Step 1: Initialize a New Odoo Project](#step-1-initialize-a-new-odoo-project)
-  - [Step 2: Build the Project](#step-2-build-the-project)
-  - [Step 3: Run the Project](#step-3-run-the-project)
-  - [Additional Commands](#additional-commands)
-  - [Conclusion](#conclusion)
+  - [Project Development](#project-development)
+    - [Prerequisites](#prerequisites)
+    - [Step 1: Initialize a New Odoo Project](#step-1-initialize-a-new-odoo-project)
+    - [Step 2: Build the Project](#step-2-build-the-project)
+    - [Step 3: Run the Project](#step-3-run-the-project)
+    - [Additional Commands](#additional-commands)
+    - [Conclusion](#conclusion)
   - [Module Development](#module-development)
     - [Overview](#overview-1)
     - [Available Options](#available-options)
@@ -51,7 +52,9 @@ This guide provides a step-by-step tutorial to help you get started with **odoox
 
 ---
 
-## Prerequisites
+## Project Development
+
+### Prerequisites
 
 Before you begin, ensure that you have the following installed:
 
@@ -61,7 +64,7 @@ Before you begin, ensure that you have the following installed:
 
 ---
 
-## Step 1: Initialize a New Odoo Project
+### Step 1: Initialize a New Odoo Project
 
 1. Open a terminal and create a new directory for your project:
    ```bash
@@ -93,7 +96,7 @@ Before you begin, ensure that you have the following installed:
 
 ---
 
-## Step 2: Build the Project
+### Step 2: Build the Project
 
 1. Build the project with a single command:
    ```bash
@@ -111,7 +114,7 @@ Before you begin, ensure that you have the following installed:
 
 ---
 
-## Step 3: Run the Project
+### Step 3: Run the Project
 
 1. Run the project using:
    ```bash
@@ -140,7 +143,7 @@ Before you begin, ensure that you have the following installed:
 
 ---
 
-## Additional Commands
+### Additional Commands
 
 - **Manage containers:**
   
@@ -198,7 +201,7 @@ Before you begin, ensure that you have the following installed:
 
 ---
 
-## Conclusion
+### Conclusion
 
 With just a few commands, **odoox** streamlines the process of setting up, building, and running Odoo projects. Explore the tool further to discover more features that simplify your Odoo development workflow.
 
@@ -478,9 +481,11 @@ More detailed command options will be documented in the respective modules.
 
 ## Future Enhancements
 
-- Add more Docker container management features.
-- Integrate module testing capabilities.
-- Support for multi-environment configurations.
+- Refactor code organisation for better readability and further development
+- Add more project management features like commands for setting configurations: username, email, etc.
+- Integrate an AI assistant for faster development.
+
+You are invited to contribute !
 
 ---
 

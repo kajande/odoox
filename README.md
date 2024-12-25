@@ -261,25 +261,43 @@ odoox m <module> --option
    ```
    Installs the specified module in the active Odoo database.
 
-3. **Uninstall a Module:**
+   Installs at the same time all dependencies specified in the `gitx.conf` file.
+   Refer to the example in that file:
+   ```
+   [module11]
+   pulluri = https://github.com/odoox-demo-org/repo1.git
+   branch =
+   track =
+   ```
+   where:
+      - `pulluri` specifies the git repository hosting your dependent module
+      - `[module11]` is the name of the your dependent module from that repository
+      - `branch` is the name of the branch your are interested in. (default to **_main_**)
+      - `track` is the commit from that branch (default to **_main_**)
+
+  You may add as many dependencies as you want from same repositories or different repositories.
+
+  Note: the repository is downloaded at **{project_name/project_name/repos}**. Check there!
+
+1. **Uninstall a Module:**
    ```bash
    odoox m my_module --i
    ```
    Uninstalls the module from the active Odoo database.
 
-4. **Activate a Module:**
+2. **Activate a Module:**
    ```bash
    odoox m my_module -a
    ```
    Activates the module by installing its data and making it ready for use.
 
-5. **Deactivate a Module:**
+3. **Deactivate a Module:**
    ```bash
    odoox m my_module --a
    ```
    Deactivates the module, effectively disabling it.
 
-6. **Update a Module:**
+4. **Update a Module:**
    ```bash
    odoox m my_module -u
    ```

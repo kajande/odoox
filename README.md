@@ -11,9 +11,11 @@ Odoox is a command-line tool designed to streamline Odoo development workflows. 
 - [Documentation for the Odoox Project](#documentation-for-the-odoox-project)
   - [Overview](#overview)
   - [Table of Contents](#table-of-contents)
-- [Tutorial: Getting Started with Odoox](#tutorial-getting-started-with-odoox)
+- [Installation](#installation)
+  - [Prerequisites](#prerequisites)
+  - [Install from sources](#install-from-sources)
+- [Usage: Getting Started with `odoox` Tutorial](#usage-getting-started-with-odoox-tutorial)
   - [Project Development](#project-development)
-    - [Prerequisites](#prerequisites)
     - [Step 1: Initialize a New Odoo Project](#step-1-initialize-a-new-odoo-project)
     - [Step 2: Build the Project](#step-2-build-the-project)
     - [Step 3: Run the Project](#step-3-run-the-project)
@@ -31,8 +33,6 @@ Odoox is a command-line tool designed to streamline Odoo development workflows. 
 - [Contribute.](#contribute)
   - [Project Structure](#project-structure)
     - [Key Files](#key-files)
-  - [Installation](#installation)
-  - [Usage](#usage)
   - [Modules Overview](#modules-overview)
     - [`config.py`](#configpy)
     - [`db.py`](#dbpy)
@@ -46,15 +46,9 @@ Odoox is a command-line tool designed to streamline Odoo development workflows. 
 
 ---
 
-# Tutorial: Getting Started with Odoox
+# Installation
 
-This guide provides a step-by-step tutorial to help you get started with **odoox**, a command-line tool designed to simplify and accelerate the Odoo development workflow. Follow these instructions to set up, build, and run an Odoo project effortlessly.
-
----
-
-## Project Development
-
-### Prerequisites
+## Prerequisites
 
 Before you begin, ensure that you have the following installed:
 
@@ -63,6 +57,37 @@ Before you begin, ensure that you have the following installed:
 - Docker
 
 ---
+
+## Install from sources
+
+1. Clone the repository:
+
+   ```bash
+   git clone https://github.com/kajande/odoox.git
+   cd odoox
+   ```
+
+2. Install the project and dependencies:
+
+   ```bash
+   pip install -e .
+   ```
+
+3. Verify installation:
+
+   ```bash
+   odoox --help
+   ```
+
+---
+
+# Usage: Getting Started with `odoox` Tutorial
+
+This guide provides a step-by-step tutorial to help you get started with **odoox**, a command-line tool designed to simplify and accelerate the Odoo development workflow. Follow these instructions to set up, build, and run an Odoo project effortlessly.
+
+---
+
+## Project Development
 
 ### Step 1: Initialize a New Odoo Project
 
@@ -369,48 +394,6 @@ odoox/
 
 ---
 
-## Installation
-
-1. Clone the repository:
-
-   ```bash
-   git clone <repository_url>
-   cd odoox
-   ```
-
-2. Install the project and dependencies:
-
-   ```bash
-   pip install -e .
-   ```
-
-3. Verify installation:
-
-   ```bash
-   odoox --help
-   ```
-
----
-
-## Usage
-
-The tool provides various commands to interact with Odoo modules, configurations, and workflows. Below are some example usages:
-
-- **Initialize a module:**
-
-  ```bash
-  odoox m <module_name> --init
-  ```
-
-- **Manage Docker containers:**
-
-  ```bash
-  odoox restart -o
-  ```
-
-More detailed command options will be documented in the respective modules.
-
----
 
 ## Modules Overview
 

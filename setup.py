@@ -6,7 +6,7 @@ with open("requirements.txt", "r") as f:
 setup(
     name='Odoox',
     description="Odoo dev automation tool",
-    version='0.0.1',
+    version='0.24.0',
     packages=find_packages(),
     install_requires=requirements,
     entry_points={

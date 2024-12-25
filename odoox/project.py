@@ -1,3 +1,4 @@
+import shutil
 import subprocess
 from pathlib import Path
 import configparser
@@ -38,6 +39,9 @@ def init_project(project_name=None, options=None):
     # create addons dir
     addons_dir = Path((f"{project_dir}/{project_name}"))/"addons"
     addons_dir.mkdir(exist_ok=True)
+
+    # remove .git folder
+    shutil.rmtree(project_dir/".git")
     
     print(f"Project '{project_name}' created successfully.")
 

@@ -67,6 +67,12 @@ class Config:
             odoo_conf_file = '/etc/odoo/odoo.conf'
         self.odoo_conf.read(odoo_conf_file)
 
+    @property
+    def base_data_path(self):
+        path = Path.home()/ '.odoox' / self.project_name
+        path.mkdir(parents=True, exist_ok=True)
+        return path
+
     def __getitem__(self, item):
         return self.config[item]      
 

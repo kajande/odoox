@@ -14,7 +14,7 @@ class Config:
         project = {
             'path': '.', 
             'user': {
-                'user': 'user', 
+                'user': 'moctarjallo', 
                 'name': 'Moctar Diallo', 
                 'email': 'moctarjallo@gmail.com'
             }

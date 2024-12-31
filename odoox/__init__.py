@@ -15,5 +15,8 @@ def execute(command, options):
     if command[0] == 'k':
         try:
             subprocess.run(f"odooxia k {command[1]}".split() + options)
-        except Exception:
+        except Exception as e:
             print("You probably don't have access to `odooxia` !")
+            print("\n\n")
+            print(e)
+            print("\n\n")

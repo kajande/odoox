@@ -3,6 +3,10 @@ import configparser
 import os
 import socket
 import docker
+from dotenv import load_dotenv
+
+# Load environment variables from a .env file if it exists
+load_dotenv()
 
 class Config:
     def __init__(self):
@@ -132,6 +136,10 @@ class Config:
     def user_email(self):
         return self.project['user']['email']
     
+    @property
+    def git_token(self):
+        return os.environ['GIT_TOKEN']
+
     @property
     def current_db(self):
         return self.odoo_conf['options']['db_name']

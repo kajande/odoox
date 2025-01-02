@@ -5,8 +5,6 @@ import socket
 import docker
 from dotenv import load_dotenv
 
-# Load environment variables from a .env file if it exists
-load_dotenv()
 
 class Config:
     def __init__(self):
@@ -14,9 +12,10 @@ class Config:
         project = {
             'path': '.', 
             'user': {
-                'user': 'moctarjallo', 
+                'user': 'user',
                 'name': 'Moctar Diallo', 
-                'email': 'moctarjallo@gmail.com'
+                'email': 'moctarjallo@gmail.com',
+                'git': 'moctarjallo',
             }
         }
         self.config['project'] = project
@@ -138,7 +137,13 @@ class Config:
     
     @property
     def git_token(self):
+        # Load environment variables from a .env file if it exists
+        load_dotenv(dotenv_path='.env', override=True)
         return os.environ['GIT_TOKEN']
+
+    @property
+    def user_git(self):
+        return self.project['user']['git']
 
     @property
     def current_db(self):

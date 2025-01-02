@@ -22,6 +22,7 @@ class Dockerx:
         options.extend(["--build-arg", f"PROJECT_NAME={self.config.project_name}"])
         options.extend(["--build-arg", f"USER_NAME={self.config.user_name}"])
         options.extend(["--build-arg", f"USER_EMAIL={self.config.user_email}"])
+        options.extend(["--build-arg", f"USER_GIT={self.config.user_git}"])
         options.extend(["--build-arg", f"GIT_TOKEN={self.config.git_token}"])
         options.extend(["--build-arg", f"CACHE_BUST={time.time()}"])
         subprocess.run(['docker', 'buildx', 'build'] + options)
